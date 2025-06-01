@@ -19,12 +19,10 @@ import {
 } from 'react-native';
 
 const Header = () => {
-    const [isFocused, setIsFocused] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const borderAnim = useRef(new Animated.Value(0)).current;
 
     const handleFocus = () => {
-        setIsFocused(true);
         Animated.timing(borderAnim, {
             toValue: 1,
             duration: 200,
@@ -33,7 +31,6 @@ const Header = () => {
     };
 
     const handleBlur = () => {
-        setIsFocused(false);
         Animated.timing(borderAnim, {
             toValue: 0,
             duration: 200,
