@@ -6,7 +6,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import {
     Animated,
@@ -15,7 +15,6 @@ import {
     StyleSheet,
     Text,
     TextInput,
-    TouchableOpacity,
     View,
 } from 'react-native';
 
@@ -151,31 +150,100 @@ const Header = () => {
 
                         <View style={styles.modalDivider} />
 
-                        <TouchableOpacity style={styles.modalItem}>
-                            <Text style={styles.modalItemText}>
-                                Trang cá nhân
-                            </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.modalItem}>
-                            <Text style={styles.modalItemText}>Thông báo</Text>
-                        </TouchableOpacity>
+                        <Pressable
+                            style={styles.modalItem}
+                            // @ts-ignore
+                            onPress={() => {
+                                router.push('/(tabs)/profile');
+                                setModalVisible(false);
+                            }}
+                        >
+                            {({ pressed }) => (
+                                <Text
+                                    style={[
+                                        styles.modalItemText,
+                                        pressed && { color: '#292929' },
+                                    ]}
+                                >
+                                    Trang cá nhân
+                                </Text>
+                            )}
+                        </Pressable>
+
+                        <Pressable
+                            style={styles.modalItem}
+                            onPress={() => {
+                                setModalVisible(false);
+                            }}
+                        >
+                            {({ pressed }) => (
+                                <Text
+                                    style={[
+                                        styles.modalItemText,
+                                        pressed && { color: '#292929' },
+                                    ]}
+                                >
+                                    Thông báo
+                                </Text>
+                            )}
+                        </Pressable>
 
                         <View style={styles.modalDivider} />
 
-                        <TouchableOpacity style={styles.modalItem}>
-                            <Text style={styles.modalItemText}>
-                                Môn học của tôi
-                            </Text>
-                        </TouchableOpacity>
+                        <Pressable
+                            style={styles.modalItem}
+                            onPress={() => {
+                                setModalVisible(false);
+                            }}
+                        >
+                            {({ pressed }) => (
+                                <Text
+                                    style={[
+                                        styles.modalItemText,
+                                        pressed && { color: '#292929' },
+                                    ]}
+                                >
+                                    Môn học của tôi
+                                </Text>
+                            )}
+                        </Pressable>
 
                         <View style={styles.modalDivider} />
 
-                        <TouchableOpacity style={styles.modalItem}>
-                            <Text style={styles.modalItemText}>Cài đặt</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.modalItem}>
-                            <Text style={styles.modalItemText}>Đăng xuất</Text>
-                        </TouchableOpacity>
+                        <Pressable
+                            style={styles.modalItem}
+                            onPress={() => {
+                                setModalVisible(false);
+                            }}
+                        >
+                            {({ pressed }) => (
+                                <Text
+                                    style={[
+                                        styles.modalItemText,
+                                        pressed && { color: '#292929' },
+                                    ]}
+                                >
+                                    Cài đặt
+                                </Text>
+                            )}
+                        </Pressable>
+                        <Pressable
+                            style={styles.modalItem}
+                            onPress={() => {
+                                setModalVisible(false);
+                            }}
+                        >
+                            {({ pressed }) => (
+                                <Text
+                                    style={[
+                                        styles.modalItemText,
+                                        pressed && { color: '#292929' },
+                                    ]}
+                                >
+                                    Đăng xuất
+                                </Text>
+                            )}
+                        </Pressable>
                     </Pressable>
                 </Pressable>
             </Modal>
@@ -243,7 +311,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         width: '100%',
         height: '100%',
-        fontSize: 16, // 1.6rem ≈ 16px
+        fontSize: 16,
         borderWidth: 0,
         color: '#000',
         textAlignVertical: 'center',
@@ -254,8 +322,8 @@ const styles = StyleSheet.create({
         position: 'relative',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: windowWidth(2), // 0.7em ≈ 11.2px (assuming 1em = 16px)
-        borderRadius: 9999, // Makes it a circle
+        padding: windowWidth(2),
+        borderRadius: 9999,
     },
 
     avatar: {
@@ -274,11 +342,11 @@ const styles = StyleSheet.create({
         marginTop: 60,
         marginRight: 10,
         color: '#1d2129',
-        minWidth: windowWidth(300),
+        minWidth: windowWidth(250),
         backgroundColor: '#fff',
         borderRadius: windowWidth(16),
         paddingVertical: windowWidth(10),
-        paddingHorizontal: windowWidth(28),
+        paddingHorizontal: windowWidth(24),
         shadowColor: '#000',
         shadowOffset: { width: 0, height: -4 },
         shadowOpacity: 0.2,
