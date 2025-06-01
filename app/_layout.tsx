@@ -10,7 +10,7 @@ import { Stack } from 'expo-router';
 import React from 'react';
 
 const Layout = () => {
-    const [loaded] = useFonts({
+    useFonts({
         Roboto_300Light,
         Roboto_400Regular,
         Roboto_700Bold,
