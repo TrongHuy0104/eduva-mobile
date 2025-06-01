@@ -11,7 +11,7 @@ module.exports = defineConfig([
         },
         rules: {
             // React Native plugin rules
-            'react-native/no-inline-styles': 'warn',
+            'react-native/no-inline-styles': 'off',
             'react-native/no-unused-styles': 'warn',
             'react-native/split-platform-components': 'warn',
 

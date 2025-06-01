@@ -1,12 +1,28 @@
+import {
+    Roboto_300Light,
+    Roboto_400Regular,
+    Roboto_500Medium,
+    Roboto_600SemiBold,
+    Roboto_700Bold,
+    useFonts,
+} from '@expo-google-fonts/roboto';
+import { Stack } from 'expo-router';
 import React from 'react';
-import { Text, View } from 'react-native';
 
-const _layout = () => {
+const Layout = () => {
+    const [loaded] = useFonts({
+        Roboto_300Light,
+        Roboto_400Regular,
+        Roboto_700Bold,
+        Roboto_600SemiBold,
+        Roboto_500Medium,
+    });
+
     return (
-        <View>
-            <Text>_layout</Text>
-        </View>
+        <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="index" />
+        </Stack>
     );
 };
 
-export default _layout;
+export default Layout;
