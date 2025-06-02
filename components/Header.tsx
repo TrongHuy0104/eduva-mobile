@@ -6,7 +6,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import {
     Animated,
@@ -47,9 +47,8 @@ const Header = () => {
             <View style={styles.header}>
                 {/* Logo */}
                 <View style={styles.logoWrapper}>
-                    <Link
-                        href="/"
-                        asChild
+                    <Pressable
+                        onPress={() => router.push('/(tabs)')}
                         style={{ display: 'flex', borderRadius: 10 }}
                     >
                         <Image
@@ -58,7 +57,7 @@ const Header = () => {
                             contentFit="contain"
                             transition={1000}
                         />
-                    </Link>
+                    </Pressable>
                 </View>
                 {/*  */}
 
@@ -210,6 +209,8 @@ const Header = () => {
                         <Pressable
                             style={styles.modalItem}
                             onPress={() => {
+                                // @ts-ignore
+                                router.push('/(routes)/settings');
                                 setModalVisible(false);
                             }}
                         >
