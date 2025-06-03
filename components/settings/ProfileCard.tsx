@@ -8,6 +8,9 @@ type Props = {
     subtitle?: string | undefined;
     avatarUrl?: string | undefined;
     readonly?: boolean;
+    dialogName?: string;
+
+    setDialogName?: (_value: string) => void;
 };
 
 const ProfileCard = ({
@@ -15,9 +18,14 @@ const ProfileCard = ({
     subtitle,
     avatarUrl,
     readonly = false,
+    dialogName,
+    setDialogName,
 }: Props) => {
     return (
         <Pressable
+            onPress={() =>
+                setDialogName && dialogName && setDialogName(dialogName)
+            }
             style={({ pressed }) => [
                 styles.container,
                 avatarUrl && { height: 104 },

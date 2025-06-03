@@ -1,0 +1,275 @@
+import React, { useEffect } from 'react';
+import { Controller } from 'react-hook-form';
+import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
+import { DefaultTheme, TextInput as PaperTextInput } from 'react-native-paper';
+
+import { FontAwesome6 } from '@expo/vector-icons';
+import type {
+    Control,
+    FieldError,
+    FieldErrorsImpl,
+    FieldValues,
+    Merge,
+    RegisterOptions,
+} from 'react-hook-form';
+
+interface InputFieldProps {
+    control: Control<FieldValues, any>;
+    name: string;
+    label: string;
+    rules?: RegisterOptions;
+    placeholder?: string;
+    error?: FieldError | Merge<FieldError, FieldErrorsImpl<any>> | undefined;
+    multiline?: boolean;
+    numberOfLines?: number;
+    disabledValidate?: boolean;
+    isSubmitted?: boolean;
+    keyboardType?: 'default' | 'phone-pad';
+}
+
+const InputField: React.FC<InputFieldProps> = ({
+    control,
+    name,
+    label,
+    rules,
+    placeholder,
+    error,
+    multiline = false,
+    numberOfLines = 4,
+    disabledValidate = false,
+    isSubmitted = false,
+    keyboardType = 'default',
+}) => {
+    const [isFocused, setIsFocused] = React.useState(false);
+    const shakeAnim = React.useRef(new Animated.Value(0)).current;
+
+    const getInputColor = (invalid: boolean, isTouched: boolean) => {
+        if (invalid && isTouched && !disabledValidate) {
+            return '#f33a58';
+        }
+        return '#1dbfaf';
+    };
+
+    const theme = {
+        ...DefaultTheme,
+        colors: {
+            ...DefaultTheme.colors,
+            primary: '#1dbfaf',
+            text: '#000000',
+            placeholder: '#666666',
+            error: 'transparent',
+        },
+    };
+
+    const handleFocus = (onBlur: () => void) => {
+        return () => {
+            setIsFocused(false);
+            onBlur();
+        };
+    };
+
+    // Hàm shake
+    const triggerShake = React.useCallback(() => {
+        shakeAnim.setValue(0);
+        Animated.sequence([
+            Animated.timing(shakeAnim, {
+                toValue: 1,
+                duration: 60,
+                easing: Easing.linear,
+                useNativeDriver: true,
+            }),
+            Animated.timing(shakeAnim, {
+                toValue: -1,
+                duration: 60,
+                easing: Easing.linear,
+                useNativeDriver: true,
+            }),
+            Animated.timing(shakeAnim, {
+                toValue: 1,
+                duration: 60,
+                easing: Easing.linear,
+                useNativeDriver: true,
+            }),
+            Animated.timing(shakeAnim, {
+                toValue: 0,
+                duration: 60,
+                easing: Easing.linear,
+                useNativeDriver: true,
+            }),
+        ]).start();
+    }, [shakeAnim]);
+
+    // State to track showError for shake animation
+    const [showError, setShowError] = React.useState(false);
+    const [fieldInvalid, setFieldInvalid] = React.useState(false);
+    const [fieldTouched, setFieldTouched] = React.useState(false);
+
+    useEffect(() => {
+        const shouldShowError = fieldInvalid && (fieldTouched || isSubmitted);
+        setShowError(shouldShowError);
+    }, [fieldInvalid, fieldTouched, isSubmitted]);
+
+    useEffect(() => {
+        if (showError) {
+            triggerShake();
+        }
+    }, [showError, triggerShake]);
+
+    return (
+        <View style={styles.container}>
+            {/* Label */}
+            <Text style={styles.label}>{label}</Text>
+
+            {/* Input Field */}
+            <Controller
+                control={control}
+                name={name}
+                rules={disabledValidate ? {} : rules}
+                render={({
+                    field: { value, onChange, onBlur },
+                    fieldState: { invalid, isTouched },
+                }) => {
+                    // Update state for error and touched
+                    if (invalid !== fieldInvalid) setFieldInvalid(invalid);
+                    if (isTouched !== fieldTouched) setFieldTouched(isTouched);
+
+                    return (
+                        <View style={{ position: 'relative', width: '100%' }}>
+                            <PaperTextInput
+                                keyboardType={keyboardType}
+                                style={[
+                                    styles.input,
+                                    multiline && styles.textarea,
+                                    showError ? styles.errorInput : null,
+                                    isFocused &&
+                                        !showError &&
+                                        styles.focusedInput,
+                                    { paddingRight: 44 },
+                                ]}
+                                contentStyle={{ paddingRight: 0 }}
+                                theme={theme}
+                                placeholder={placeholder}
+                                value={value}
+                                underlineColor="transparent"
+                                activeUnderlineColor="transparent"
+                                onChangeText={onChange}
+                                onBlur={handleFocus(onBlur)}
+                                onFocus={() => setIsFocused(true)}
+                                error={showError && !disabledValidate}
+                                multiline={multiline}
+                                numberOfLines={numberOfLines}
+                                textAlignVertical={multiline ? 'top' : 'center'}
+                                cursorColor={getInputColor(invalid, isTouched)}
+                                selectionColor={`${getInputColor(
+                                    invalid,
+                                    isTouched
+                                )}20`}
+                            />
+                            {showError && (
+                                <Animated.View
+                                    style={[
+                                        styles.iconContainer,
+                                        {
+                                            transform: [
+                                                {
+                                                    translateX:
+                                                        shakeAnim.interpolate({
+                                                            inputRange: [-1, 1],
+                                                            outputRange: [
+                                                                -8, 8,
+                                                            ],
+                                                        }),
+                                                },
+                                            ],
+                                        },
+                                    ]}
+                                >
+                                    <FontAwesome6
+                                        name="triangle-exclamation"
+                                        size={22}
+                                        color="#f33a58"
+                                    />
+                                </Animated.View>
+                            )}
+                        </View>
+                    );
+                }}
+            />
+
+            {/* Error Message */}
+            {!disabledValidate &&
+                error &&
+                typeof (error as any)?.message === 'string' && (
+                    <Text style={styles.errorText}>
+                        {(error as any).message}
+                    </Text>
+                )}
+        </View>
+    );
+};
+
+const styles = StyleSheet.create({
+    container: {
+        textAlign: 'left',
+        width: '100%',
+        color: '#292929',
+    },
+    label: {
+        fontSize: 14,
+        fontWeight: '600',
+        marginVertical: 10,
+        marginLeft: 8,
+    },
+    input: {
+        backgroundColor: '#fff',
+        borderTopLeftRadius: 44,
+        borderTopRightRadius: 44,
+        borderBottomLeftRadius: 44,
+        borderBottomRightRadius: 44,
+        height: 44,
+        flexDirection: 'row',
+        borderWidth: 1.5,
+        borderColor: '#dee3e9',
+        width: '100%',
+        paddingRight: 0,
+        paddingLeft: 0,
+        fontSize: 16,
+        textAlign: 'left',
+    },
+    textarea: {
+        borderTopLeftRadius: 16,
+        borderTopRightRadius: 16,
+        borderBottomLeftRadius: 16,
+        borderBottomRightRadius: 16,
+        minHeight: 100,
+        height: 'auto',
+        paddingTop: 12,
+        paddingBottom: 12,
+        textAlignVertical: 'top',
+        textAlign: 'left',
+    },
+    errorInput: {
+        borderColor: '#f33a58',
+        backgroundColor: '#ff00001a',
+    },
+    errorText: {
+        color: '#f33a58',
+        marginVertical: 8,
+        marginLeft: 8,
+        fontSize: 14,
+        fontWeight: 500,
+    },
+    focusedInput: {
+        borderColor: '#1dbfaf',
+    },
+    iconContainer: {
+        position: 'absolute',
+        right: 12,
+        top: '43%',
+        marginTop: -9,
+        zIndex: 10,
+        backgroundColor: 'transparent',
+    },
+});
+
+export default InputField;
