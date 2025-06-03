@@ -58,8 +58,8 @@ const UpdateAvatar = () => {
             const formData = new FormData();
             formData.append('avatar', {
                 uri: selectedAsset.uri,
-                type: selectedAsset.type || 'image/jpeg',
-                name: selectedAsset.fileName || 'avatar.jpg',
+                type: selectedAsset.type ?? 'image/jpeg',
+                name: selectedAsset.fileName ?? 'avatar.jpg',
             } as any);
 
             const res = await fetch('https://your-api.com/api/upload-avatar', {
@@ -87,7 +87,7 @@ const UpdateAvatar = () => {
         <View>
             <View style={styles.avatarWrap}>
                 <Image
-                    source={{ uri: localAvatar || avatar }}
+                    source={{ uri: localAvatar ?? avatar }}
                     style={styles.avatar}
                     resizeMode="cover"
                 />

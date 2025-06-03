@@ -26,7 +26,7 @@ interface InputFieldProps {
     label: string;
     rules?: RegisterOptions;
     placeholder?: string;
-    error?: FieldError | Merge<FieldError, FieldErrorsImpl<any>> | undefined;
+    error?: FieldError | Merge<FieldError, FieldErrorsImpl<any>>;
     multiline?: boolean;
     numberOfLines?: number;
     disabledValidate?: boolean;
@@ -168,7 +168,7 @@ const InputField: React.FC<InputFieldProps> = ({
                                 contentStyle={{ paddingRight: 0 }}
                                 theme={theme}
                                 placeholder={placeholder}
-                                value={value || defaultValue}
+                                value={value ?? defaultValue}
                                 underlineColor="transparent"
                                 activeUnderlineColor="transparent"
                                 onChangeText={onChange}

@@ -5,8 +5,8 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 type Props = {
     title: string;
-    subtitle?: string | undefined;
-    avatarUrl?: string | undefined;
+    subtitle?: string;
+    avatarUrl?: string;
     readonly?: boolean;
     dialogName?: string;
 
@@ -42,7 +42,7 @@ const ProfileCard = ({
                     />
                 ) : (
                     <Text style={styles.subtitle}>
-                        {subtitle || 'Chưa cập nhật'}
+                        {subtitle ?? 'Chưa cập nhật'}
                     </Text>
                 )}
             </View>

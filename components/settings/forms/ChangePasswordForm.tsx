@@ -84,7 +84,7 @@ export default function ChangePasswordForm() {
                     error={errors?.['new-password']}
                     isSubmitted={isSubmitted}
                 />
-                <PasswordStrength password={newPasswordValue || ''} />
+                <PasswordStrength password={newPasswordValue ?? ''} />
             </View>
 
             <View style={{ width: '100%', marginTop: 10, overflow: 'hidden' }}>

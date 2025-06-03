@@ -55,7 +55,7 @@ const PasswordStrength = ({ password }: PasswordStrengthProps) => {
                     />
                 ))}
             </View>
-            {password && (
+            {!!password && (
                 <Text style={[styles.strengthText, { color }]}>{text}</Text>
             )}
         </View>

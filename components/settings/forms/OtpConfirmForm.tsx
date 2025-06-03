@@ -12,8 +12,8 @@ import {
 const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
 
 interface OtpConfirmFormProps {
-    onSubmit?: (_otp: string) => void;
-    onResend?: () => void;
+    readonly onSubmit?: (_otp: string) => void;
+    readonly onResend?: () => void;
 }
 
 export default function OtpConfirmForm({
