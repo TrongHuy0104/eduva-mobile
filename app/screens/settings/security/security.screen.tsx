@@ -1,10 +1,15 @@
+import Dialog from '@/components/settings/Dialog';
+import ChangePasswordForm from '@/components/settings/forms/ChangePasswordForm';
+import ConfirmPasswordForm from '@/components/settings/forms/ConfirmPasswordForm';
 import ProfileCard from '@/components/settings/ProfileCard';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React from 'react';
+import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 const SecurityScreen = () => {
+    const [dialogName, setDialogName] = useState('');
+
     return (
         <ScrollView showsVerticalScrollIndicator={false}>
             <View style={styles.headerRow}>
@@ -45,10 +50,33 @@ const SecurityScreen = () => {
                     <ProfileCard
                         title="Đổi mật khẩu"
                         subtitle="Lần đổi gần nhất: 4 tháng trước"
+                        dialogName={'change-password'}
+                        setDialogName={setDialogName}
                     />
-                    <ProfileCard title="Xác minh 2 bước" subtitle="Đang tắt" />
+                    <ProfileCard
+                        title="Xác minh 2 bước"
+                        subtitle="Đang tắt"
+                        dialogName={'confirm-password'}
+                        setDialogName={setDialogName}
+                    />
                 </View>
             </View>
+
+            {/* Dialogs List */}
+            {dialogName === 'confirm-password' && (
+                <Dialog setDialogName={setDialogName}>
+                    <ConfirmPasswordForm />
+                </Dialog>
+            )}
+            {dialogName === 'change-password' && (
+                <Dialog
+                    setDialogName={setDialogName}
+                    title="Đổi mật khẩu"
+                    desc=" Mật khẩu của bạn phải có tối thiểu 8 ký tự, bao gồm cả chữ số, chữ cái và ký tự đặc biệt (!$@%...). "
+                >
+                    <ChangePasswordForm />
+                </Dialog>
+            )}
         </ScrollView>
     );
 };

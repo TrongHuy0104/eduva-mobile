@@ -127,6 +127,7 @@ const PersonalScreen = () => {
                 </View>
             </View>
 
+            {/* Dialogs List */}
             {dialogName === 'bio' && (
                 <Dialog
                     setDialogName={setDialogName}

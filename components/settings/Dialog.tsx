@@ -72,8 +72,8 @@ const Dialog = ({ title, desc, setDialogName, children }: Props) => {
                         </Pressable>
                     </View>
 
-                    <Text style={styles.heading}>{title}</Text>
-                    <Text style={styles.subheading}>{desc}</Text>
+                    {title && <Text style={styles.heading}>{title}</Text>}
+                    {desc && <Text style={styles.subheading}>{desc}</Text>}
 
                     {children}
                 </Pressable>

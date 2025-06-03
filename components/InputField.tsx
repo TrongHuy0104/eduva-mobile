@@ -1,6 +1,13 @@
 import React, { useEffect } from 'react';
 import { Controller } from 'react-hook-form';
-import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
+import {
+    Animated,
+    Easing,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 import { DefaultTheme, TextInput as PaperTextInput } from 'react-native-paper';
 
 import { FontAwesome6 } from '@expo/vector-icons';
@@ -25,6 +32,9 @@ interface InputFieldProps {
     disabledValidate?: boolean;
     isSubmitted?: boolean;
     keyboardType?: 'default' | 'phone-pad';
+    secureTextEntry?: boolean;
+    defaultValue?: string;
+    readOnly?: boolean;
 }
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -39,6 +49,9 @@ const InputField: React.FC<InputFieldProps> = ({
     disabledValidate = false,
     isSubmitted = false,
     keyboardType = 'default',
+    secureTextEntry = false,
+    defaultValue = '',
+    readOnly = false,
 }) => {
     const [isFocused, setIsFocused] = React.useState(false);
     const shakeAnim = React.useRef(new Animated.Value(0)).current;
@@ -103,6 +116,7 @@ const InputField: React.FC<InputFieldProps> = ({
     const [showError, setShowError] = React.useState(false);
     const [fieldInvalid, setFieldInvalid] = React.useState(false);
     const [fieldTouched, setFieldTouched] = React.useState(false);
+    const [showPassword, setShowPassword] = React.useState(false);
 
     useEffect(() => {
         const shouldShowError = fieldInvalid && (fieldTouched || isSubmitted);
@@ -146,10 +160,15 @@ const InputField: React.FC<InputFieldProps> = ({
                                         styles.focusedInput,
                                     { paddingRight: 44 },
                                 ]}
+                                secureTextEntry={
+                                    secureTextEntry && !showPassword
+                                }
+                                defaultValue={defaultValue}
+                                readOnly={readOnly}
                                 contentStyle={{ paddingRight: 0 }}
                                 theme={theme}
                                 placeholder={placeholder}
-                                value={value}
+                                value={value || defaultValue}
                                 underlineColor="transparent"
                                 activeUnderlineColor="transparent"
                                 onChangeText={onChange}
@@ -165,7 +184,8 @@ const InputField: React.FC<InputFieldProps> = ({
                                     isTouched
                                 )}20`}
                             />
-                            {showError && (
+                            {/* Error Icon */}
+                            {showError && !secureTextEntry && (
                                 <Animated.View
                                     style={[
                                         styles.iconContainer,
@@ -190,6 +210,41 @@ const InputField: React.FC<InputFieldProps> = ({
                                         color="#f33a58"
                                     />
                                 </Animated.View>
+                            )}
+
+                            {/* Password Eye Icon */}
+                            {secureTextEntry && (
+                                <TouchableOpacity
+                                    style={[
+                                        styles.iconContainer,
+                                        showError && {
+                                            transform: [
+                                                {
+                                                    translateX:
+                                                        shakeAnim.interpolate({
+                                                            inputRange: [-1, 1],
+                                                            outputRange: [
+                                                                -8, 8,
+                                                            ],
+                                                        }),
+                                                },
+                                            ],
+                                        },
+                                    ]}
+                                    onPress={() =>
+                                        setShowPassword(!showPassword)
+                                    }
+                                >
+                                    <FontAwesome6
+                                        name={
+                                            showPassword ? 'eye-slash' : 'eye'
+                                        }
+                                        size={20}
+                                        color={
+                                            showError ? '#f33a58' : '#666666'
+                                        }
+                                    />
+                                </TouchableOpacity>
                             )}
                         </View>
                     );
