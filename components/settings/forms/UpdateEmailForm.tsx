@@ -64,9 +64,10 @@ export default function UpdateEmailForm() {
                 style={{ opacity: !inputValue ? 0.5 : 1 }}
             >
                 <LinearGradient
-                    colors={['#2cccff', '#22dfbf']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
+                    colors={['#4dbfe9', '#2093e7', '#22cfd2']}
+                    locations={[0, 0.5, 1]}
+                    start={{ x: 0.33, y: 0 }}
+                    end={{ x: 1, y: 1 }}
                     style={{
                         marginTop: 20,
                         paddingVertical: 12,
