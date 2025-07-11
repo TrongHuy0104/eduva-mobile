@@ -14,10 +14,6 @@ module.exports = defineConfig([
             'react-native/no-inline-styles': 'off',
             'react-native/no-unused-styles': 'warn',
             'react-native/split-platform-components': 'warn',
-
-            // General
-            'no-console': 'warn',
-            'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
         },
         languageOptions: {
             parserOptions: {

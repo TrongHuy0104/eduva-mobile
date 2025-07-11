@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Controller } from 'react-hook-form';
 import {
     Animated,
@@ -23,7 +23,7 @@ import type {
 interface InputFieldProps {
     control: Control<FieldValues, any>;
     name: string;
-    label: string;
+    label?: string;
     rules?: RegisterOptions;
     placeholder?: string;
     error?: FieldError | Merge<FieldError, FieldErrorsImpl<any>>;
@@ -55,19 +55,31 @@ const InputField: React.FC<InputFieldProps> = ({
 }) => {
     const [isFocused, setIsFocused] = React.useState(false);
     const shakeAnim = React.useRef(new Animated.Value(0)).current;
+    const [showPassword, setShowPassword] = React.useState(false);
+    // Store latest field state for validation and shake
+    const latestFieldState = React.useRef({
+        invalid: false,
+        isTouched: false,
+        isSubmitted: false,
+    });
+    const [shouldShowError, setShouldShowError] = React.useState(false);
+    const prevShouldShowError = React.useRef(false);
+    // Add state for invalid and isTouched
+    const [fieldInvalid, setFieldInvalid] = React.useState(false);
+    const [fieldTouched, setFieldTouched] = React.useState(false);
 
     const getInputColor = (invalid: boolean, isTouched: boolean) => {
         if (invalid && isTouched && !disabledValidate) {
             return '#f33a58';
         }
-        return '#1dbfaf';
+        return '#2093e7';
     };
 
     const theme = {
         ...DefaultTheme,
         colors: {
             ...DefaultTheme.colors,
-            primary: '#1dbfaf',
+            primary: '#2093e7',
             text: '#000000',
             placeholder: '#666666',
             error: 'transparent',
@@ -81,58 +93,46 @@ const InputField: React.FC<InputFieldProps> = ({
         };
     };
 
-    // Hàm shake
-    const triggerShake = React.useCallback(() => {
-        shakeAnim.setValue(0);
-        Animated.sequence([
-            Animated.timing(shakeAnim, {
-                toValue: 1,
-                duration: 60,
-                easing: Easing.linear,
-                useNativeDriver: true,
-            }),
-            Animated.timing(shakeAnim, {
-                toValue: -1,
-                duration: 60,
-                easing: Easing.linear,
-                useNativeDriver: true,
-            }),
-            Animated.timing(shakeAnim, {
-                toValue: 1,
-                duration: 60,
-                easing: Easing.linear,
-                useNativeDriver: true,
-            }),
-            Animated.timing(shakeAnim, {
-                toValue: 0,
-                duration: 60,
-                easing: Easing.linear,
-                useNativeDriver: true,
-            }),
-        ]).start();
-    }, [shakeAnim]);
-
-    // State to track showError for shake animation
-    const [showError, setShowError] = React.useState(false);
-    const [fieldInvalid, setFieldInvalid] = React.useState(false);
-    const [fieldTouched, setFieldTouched] = React.useState(false);
-    const [showPassword, setShowPassword] = React.useState(false);
-
-    useEffect(() => {
-        const shouldShowError = fieldInvalid && (fieldTouched || isSubmitted);
-        setShowError(shouldShowError);
-    }, [fieldInvalid, fieldTouched, isSubmitted]);
-
-    useEffect(() => {
-        if (showError) {
-            triggerShake();
+    React.useEffect(() => {
+        const localShouldShowError =
+            fieldInvalid && (fieldTouched || isSubmitted) && !disabledValidate;
+        setShouldShowError(localShouldShowError);
+        if (!prevShouldShowError.current && localShouldShowError) {
+            shakeAnim.setValue(0);
+            Animated.sequence([
+                Animated.timing(shakeAnim, {
+                    toValue: 1,
+                    duration: 60,
+                    easing: Easing.linear,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(shakeAnim, {
+                    toValue: -1,
+                    duration: 60,
+                    easing: Easing.linear,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(shakeAnim, {
+                    toValue: 1,
+                    duration: 60,
+                    easing: Easing.linear,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(shakeAnim, {
+                    toValue: 0,
+                    duration: 60,
+                    easing: Easing.linear,
+                    useNativeDriver: true,
+                }),
+            ]).start();
         }
-    }, [showError, triggerShake]);
+        prevShouldShowError.current = localShouldShowError;
+    }, [fieldInvalid, fieldTouched, isSubmitted, disabledValidate, shakeAnim]);
 
     return (
         <View style={styles.container}>
             {/* Label */}
-            <Text style={styles.label}>{label}</Text>
+            {label && <Text style={styles.label}>{label}</Text>}
 
             {/* Input Field */}
             <Controller
@@ -143,10 +143,15 @@ const InputField: React.FC<InputFieldProps> = ({
                     field: { value, onChange, onBlur },
                     fieldState: { invalid, isTouched },
                 }) => {
-                    // Update state for error and touched
-                    if (invalid !== fieldInvalid) setFieldInvalid(invalid);
-                    if (isTouched !== fieldTouched) setFieldTouched(isTouched);
-
+                    // Always update latestFieldState with isSubmitted from props
+                    latestFieldState.current = {
+                        invalid,
+                        isTouched,
+                        isSubmitted,
+                    };
+                    // Update state for useEffect
+                    if (fieldInvalid !== invalid) setFieldInvalid(invalid);
+                    if (fieldTouched !== isTouched) setFieldTouched(isTouched);
                     return (
                         <View style={{ position: 'relative', width: '100%' }}>
                             <PaperTextInput
@@ -154,9 +159,9 @@ const InputField: React.FC<InputFieldProps> = ({
                                 style={[
                                     styles.input,
                                     multiline && styles.textarea,
-                                    showError ? styles.errorInput : null,
+                                    shouldShowError ? styles.errorInput : null,
                                     isFocused &&
-                                        !showError &&
+                                        !shouldShowError &&
                                         styles.focusedInput,
                                     { paddingRight: 44 },
                                 ]}
@@ -174,7 +179,7 @@ const InputField: React.FC<InputFieldProps> = ({
                                 onChangeText={onChange}
                                 onBlur={handleFocus(onBlur)}
                                 onFocus={() => setIsFocused(true)}
-                                error={showError && !disabledValidate}
+                                error={shouldShowError}
                                 multiline={multiline}
                                 numberOfLines={numberOfLines}
                                 textAlignVertical={multiline ? 'top' : 'center'}
@@ -185,7 +190,7 @@ const InputField: React.FC<InputFieldProps> = ({
                                 )}20`}
                             />
                             {/* Error Icon */}
-                            {showError && !secureTextEntry && (
+                            {shouldShowError && !secureTextEntry && (
                                 <Animated.View
                                     style={[
                                         styles.iconContainer,
@@ -206,7 +211,7 @@ const InputField: React.FC<InputFieldProps> = ({
                                 >
                                     <FontAwesome6
                                         name="triangle-exclamation"
-                                        size={22}
+                                        size={20}
                                         color="#f33a58"
                                     />
                                 </Animated.View>
@@ -217,7 +222,7 @@ const InputField: React.FC<InputFieldProps> = ({
                                 <TouchableOpacity
                                     style={[
                                         styles.iconContainer,
-                                        showError && {
+                                        shouldShowError && {
                                             transform: [
                                                 {
                                                     translateX:
@@ -241,7 +246,9 @@ const InputField: React.FC<InputFieldProps> = ({
                                         }
                                         size={20}
                                         color={
-                                            showError ? '#f33a58' : '#666666'
+                                            shouldShowError
+                                                ? '#f33a58'
+                                                : '#666666'
                                         }
                                     />
                                 </TouchableOpacity>
@@ -315,7 +322,7 @@ const styles = StyleSheet.create({
         fontWeight: 500,
     },
     focusedInput: {
-        borderColor: '#1dbfaf',
+        borderColor: '#2093e7',
     },
     iconContainer: {
         position: 'absolute',
