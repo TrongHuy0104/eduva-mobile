@@ -41,7 +41,8 @@ const Header = () => {
                 {/* Logo */}
                 <View style={styles.logoWrapper}>
                     <Pressable
-                        onPress={() => router.push('/(tabs)')}
+                        //@ts-ignore
+                        onPress={() => router.push('/(tabs)/home')}
                         style={{ display: 'flex', borderRadius: 10 }}
                     >
                         <Image

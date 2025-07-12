@@ -1,9 +1,11 @@
+import { windowWidth } from '@/constants/app.constants';
+import { ClassModel } from '@/types/models/class.model';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-const SubjectCard = () => {
+const ClassCard = ({ classItem }: { classItem: ClassModel }) => {
     const handlePress = () => {
         // Handle navigation or any action here
         // Example: navigate to subject detail
@@ -12,7 +14,7 @@ const SubjectCard = () => {
     return (
         <Pressable
             style={({ pressed }) => [
-                styles.subjectContainer,
+                styles.classContainer,
                 pressed && styles.pressed,
             ]}
             android_ripple={{ color: '#e0e0e0', borderless: false, radius: 16 }}
@@ -20,34 +22,38 @@ const SubjectCard = () => {
         >
             <View style={styles.imageWrapper}>
                 <Image
-                    source="https://files.fullstack.edu.vn/f8-prod/courses/2.png"
+                    source={classItem.backgroundImageUrl}
                     style={styles.image}
                     contentFit="cover"
                 />
             </View>
             <View style={styles.contentContainer}>
                 <Text style={styles.contentHeading} numberOfLines={2}>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Tenetur repudiandae nulla maxime excepturi natus nam fuga
-                    cumque consectetur ut? Nulla.
+                    {classItem.className}
                 </Text>
                 <Text style={styles.contentSubHeading} numberOfLines={1}>
-                    Khối 10
+                    {classItem.schoolName}
                 </Text>
                 <View style={styles.moreInfos}>
                     <View style={styles.infoItem}>
-                        <FontAwesome6
-                            solid
-                            name="circle-play"
-                            size={14}
-                            color="#666"
-                        />
-                        <Text>55</Text>
+                        {/* Avatar */}
+                        <View style={styles.avatarWrapper}>
+                            <Image
+                                style={styles.avatar}
+                                source={classItem.teacherAvatarUrl}
+                                contentFit="contain"
+                                transition={1000}
+                            />
+                        </View>
+                        {/*  */}
+                        <Text ellipsizeMode="tail" numberOfLines={1}>
+                            {classItem.teacherName}
+                        </Text>
                     </View>
                     <View style={styles.infoItem}>
                         <FontAwesome6
                             solid
-                            name="clock"
+                            name="circle-play"
                             size={14}
                             color="#666"
                         />
@@ -59,10 +65,10 @@ const SubjectCard = () => {
     );
 };
 
-export default SubjectCard;
+export default ClassCard;
 
 const styles = StyleSheet.create({
-    subjectContainer: {
+    classContainer: {
         position: 'relative',
         width: '100%',
         borderRadius: 16,
@@ -97,7 +103,7 @@ const styles = StyleSheet.create({
     contentSubHeading: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#f05123',
+        color: '#2093e7',
     },
     moreInfos: {
         display: 'flex',
@@ -111,5 +117,16 @@ const styles = StyleSheet.create({
         gap: 6,
         color: '#666',
         fontSize: 14,
+        flexShrink: 0,
+        maxWidth: '55%',
+    },
+    avatarWrapper: {
+        alignItems: 'center',
+    },
+    avatar: {
+        width: windowWidth(20),
+        height: windowWidth(20),
+        flexShrink: 0,
+        borderRadius: windowWidth(10),
     },
 });
