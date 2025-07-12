@@ -14,7 +14,6 @@ const UserActions = () => {
     const { user } = useAuth();
     const { openModal, closeModal } = useModal();
     const { mutate: logout, isPending } = useLogout();
-    console.log(user);
 
     return (
         <>
@@ -29,7 +28,7 @@ const UserActions = () => {
                     >
                         <Image
                             style={[styles.avatar]}
-                            source="https://files.fullstack.edu.vn/f8-prod/public-images/6833d787bbd19.png"
+                            source={user.avatarUrl}
                             contentFit="contain"
                             transition={1000}
                         />
@@ -68,6 +67,7 @@ const UserActions = () => {
             {/* Modal */}
             <Modal
                 visible={modalVisible}
+                style={{ maxWidth: '50%' }}
                 transparent
                 animationType="fade"
                 onRequestClose={() => setModalVisible(false)}
@@ -98,15 +98,21 @@ const UserActions = () => {
                                             height: windowWidth(66),
                                         },
                                     ]}
-                                    source="https://files.fullstack.edu.vn/f8-prod/public-images/6833d787bbd19.png"
+                                    source={user?.avatarUrl}
                                     contentFit="contain"
                                 />
                             </LinearGradient>
                             <View style={{ marginLeft: windowWidth(20) }}>
-                                <Text style={styles.modalName}>Trọng Huy</Text>
-                                <Text style={styles.modalUsername}>
-                                    @huytrong
+                                <Text
+                                    style={styles.modalName}
+                                    ellipsizeMode="tail"
+                                    numberOfLines={1}
+                                >
+                                    {user?.fullName}
                                 </Text>
+                                {/* <Text style={styles.modalUsername}>
+                                    {user?.email}
+                                </Text> */}
                             </View>
                         </View>
 
@@ -255,10 +261,12 @@ const styles = StyleSheet.create({
     modalHeader: {
         flexDirection: 'row',
         alignItems: 'center',
+        maxWidth: 300,
     },
     modalName: {
         fontWeight: 'bold',
         fontSize: 16,
+        maxWidth: 200,
     },
     modalUsername: {
         color: '#888',

@@ -1,7 +1,7 @@
 import { FontAwesome6 } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import SubjectCard from '../SubjectCard';
+// import ClassCard from '../ClassCard';
 
 const Activity = () => {
     return (
@@ -16,7 +16,7 @@ const Activity = () => {
             <View style={[styles.subjectsRow, { marginTop: 24 }]}>
                 {Array.from({ length: 10 }).map((_, idx) => (
                     <View style={styles.subjectCol} key={idx}>
-                        <SubjectCard />
+                        {/* <ClassCard /> */}
                     </View>
                 ))}
             </View>

@@ -1,16 +1,24 @@
 import BannerCarousel from '@/components/BannerCarousel';
-import SubjectCard from '@/components/SubjectCard';
+import SubjectCard from '@/components/ClassCard';
+import SubjectCardSkeleton from '@/components/skeleton/ClassCardSkeleton';
 import { useAuth } from '@/contexts/auth.context';
 import { useClass } from '@/hooks/useClass';
+import { useToast } from '@/hooks/useToast';
+import { ClassModel } from '@/types/models/class.model';
 import { FontAwesome6 } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 const HomeScreen = () => {
     const { user } = useAuth();
-    const { data, isPending: isLoadingClasses, error } = useClass();
+    const toast = useToast();
+    const { data: classes, isPending: isLoadingClasses, error } = useClass();
 
-    if (isLoadingClasses) return <></>;
+    if (error) {
+        toast.errorGeneral();
+    }
+
     return (
         <ScrollView
             style={{ flex: 1, backgroundColor: '#fff' }}
@@ -30,12 +38,13 @@ const HomeScreen = () => {
                                 flexDirection: 'row',
                                 alignItems: 'center',
                             }}
+                            onPress={() => router.push('/(tabs)/home/classes')}
                         >
                             <Text
                                 style={{
                                     color: '#2093e7',
                                     fontWeight: '500',
-                                    fontSize: 18,
+                                    fontSize: 17,
                                     marginRight: 4,
                                 }}
                             >
@@ -45,19 +54,29 @@ const HomeScreen = () => {
                                 <FontAwesome6
                                     name="chevron-right"
                                     solid
-                                    size={18}
+                                    size={17}
                                     color="#2093e7"
                                 />
                             </View>
                         </Pressable>
                     </View>
-
                     <View style={styles.subjectsRow}>
-                        {Array.from({ length: 10 }).map((_, idx) => (
-                            <View style={styles.subjectCol} key={idx}>
-                                <SubjectCard />
-                            </View>
-                        ))}
+                        {isLoadingClasses
+                            ? Array.from({ length: 12 }).map((_, idx) => (
+                                  <View style={styles.subjectCol} key={idx}>
+                                      <SubjectCardSkeleton />
+                                  </View>
+                              ))
+                            : classes?.map(
+                                  (classItem: ClassModel, idx: number) => (
+                                      <View
+                                          style={styles.subjectCol}
+                                          key={classItem.id ?? idx}
+                                      >
+                                          <SubjectCard classItem={classItem} />
+                                      </View>
+                                  )
+                              )}
                     </View>
                 </View>
             )}

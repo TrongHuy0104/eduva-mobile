@@ -3,7 +3,7 @@ import { fontSizes } from '@/constants/app.constants';
 import { Colors } from '@/constants/Colors';
 import { useAuth } from '@/contexts/auth.context';
 import { FontAwesome6 } from '@expo/vector-icons';
-import { Tabs } from 'expo-router';
+import { router, Tabs } from 'expo-router';
 import React from 'react';
 import { Pressable, StatusBar, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -22,7 +22,7 @@ const Layout = () => {
                 borderTopWidth: 1,
                 borderColor: '#e8ebed',
                 alignItems: 'center',
-                justifyContent: 'center',
+                justifyContent: 'space-evenly', // changed from 'center' to 'space-evenly'
                 width: '100%',
             }}
         >
@@ -31,7 +31,7 @@ const Layout = () => {
                 const isFocused = state.index === index;
                 let icon = null;
                 let label = '';
-                if (route.name === 'index') {
+                if (route.name === 'home') {
                     icon = (
                         <FontAwesome6
                             name="house"
@@ -64,13 +64,21 @@ const Layout = () => {
                 return (
                     <Pressable
                         key={route.key}
-                        onPress={() => navigation.navigate(route.name)}
+                        onPress={() => {
+                            if (route.name === 'home') {
+                                // Always navigate to home index when home tab is pressed
+                                router.push('/(tabs)/home');
+                            } else {
+                                router.push('/(tabs)/profile');
+                            }
+                        }}
                         style={{
-                            width: '50%',
+                            flex: 1,
                             alignItems: 'center',
                             justifyContent: 'center',
                             height: '100%',
                         }}
+                        android_ripple={{ color: 'rgba(0,0,0,0.1)' }}
                     >
                         {icon}
                         <Text
@@ -101,7 +109,7 @@ const Layout = () => {
                 screenOptions={{ headerShown: false }}
                 tabBar={(props) => <CustomTabBar {...props} />}
             >
-                <Tabs.Screen name="index" />
+                <Tabs.Screen name="home" />
                 <Tabs.Screen name="profile/index" />
             </Tabs>
         </SafeAreaView>
