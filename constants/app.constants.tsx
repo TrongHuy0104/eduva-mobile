@@ -58,3 +58,5 @@ export const fontSizes = {
     FONT32: windowWidth(32),
     FONT35: windowWidth(35),
 };
+
+export const PAGE_SIZE = 12;

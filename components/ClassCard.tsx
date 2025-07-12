@@ -124,9 +124,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     avatar: {
-        width: windowWidth(20),
-        height: windowWidth(20),
+        width: windowWidth(26),
+        height: windowWidth(26),
         flexShrink: 0,
-        borderRadius: windowWidth(10),
+        borderRadius: windowWidth(9999),
     },
 });
