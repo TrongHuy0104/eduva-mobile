@@ -12,6 +12,7 @@ const AuthFormWrapper = () => {
             {/* Logo */}
             <View style={styles.logoWrapper}>
                 <Pressable
+                    // @ts-ignore
                     onPress={() => router.push('/(tabs)')}
                     style={{ display: 'flex', borderRadius: 10 }}
                 >

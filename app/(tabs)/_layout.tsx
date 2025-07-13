@@ -10,10 +10,28 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { moderateScale } from 'react-native-size-matters';
 
 const Layout = () => {
+    return (
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
+            <StatusBar barStyle="light-content" backgroundColor="#000" />
+            <Header />
+
+            <Tabs
+                screenOptions={{ headerShown: false }}
+                tabBar={(props) => <CustomTabBar {...props} />}
+            >
+                <Tabs.Screen name="home" />
+                <Tabs.Screen name="profile/index" />
+            </Tabs>
+        </SafeAreaView>
+    );
+};
+
+export default Layout;
+
+const CustomTabBar = ({ state }: any) => {
     const { user } = useAuth();
 
-    // Fully custom tab bar for all cases
-    const CustomTabBar = ({ state, descriptors, navigation }: any) => (
+    return (
         <View
             style={{
                 flexDirection: 'row',
@@ -27,7 +45,6 @@ const Layout = () => {
             }}
         >
             {state.routes.map((route: any, index: number) => {
-                const { options } = descriptors[route.key];
                 const isFocused = state.index === index;
                 let icon = null;
                 let label = '';
@@ -99,21 +116,4 @@ const Layout = () => {
             })}
         </View>
     );
-
-    return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
-            <StatusBar barStyle="light-content" backgroundColor="#000" />
-            <Header />
-
-            <Tabs
-                screenOptions={{ headerShown: false }}
-                tabBar={(props) => <CustomTabBar {...props} />}
-            >
-                <Tabs.Screen name="home" />
-                <Tabs.Screen name="profile/index" />
-            </Tabs>
-        </SafeAreaView>
-    );
 };
-
-export default Layout;
