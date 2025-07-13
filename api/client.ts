@@ -57,7 +57,7 @@ client.interceptors.response.use(
                 await removeItem('user');
 
                 // You would typically navigate to login here
-                router.push('/(tabs)');
+                router.push('/(tabs)/home');
 
                 return Promise.reject(refreshError);
             }

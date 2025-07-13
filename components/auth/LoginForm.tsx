@@ -20,15 +20,11 @@ const LoginForm = () => {
     const {
         control,
         handleSubmit,
-        formState: { errors, isSubmitted, isValid },
-        watch,
+        formState: { errors, isSubmitted },
     } = useForm({
         mode: 'onTouched',
         reValidateMode: 'onChange',
     });
-
-    const emailValue = watch('email');
-    const passwordValue = watch('password');
 
     const onSubmit = async (data: any) => {
         login(data as LoginRequest);

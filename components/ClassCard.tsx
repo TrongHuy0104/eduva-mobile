@@ -2,13 +2,14 @@ import { windowWidth } from '@/constants/app.constants';
 import { ClassModel } from '@/types/models/class.model';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { Image } from 'expo-image';
+import { router } from 'expo-router';
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 const ClassCard = ({ classItem }: { classItem: ClassModel }) => {
     const handlePress = () => {
-        // Handle navigation or any action here
-        // Example: navigate to subject detail
+        // @ts-ignore
+        router.push(`/home/class/${classItem.classId}`);
     };
 
     return (

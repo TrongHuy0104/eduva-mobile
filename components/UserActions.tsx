@@ -12,8 +12,8 @@ import AuthFormWrapper from './auth/AuthFormWrapper';
 const UserActions = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const { user } = useAuth();
-    const { openModal, closeModal } = useModal();
-    const { mutate: logout, isPending } = useLogout();
+    const { openModal } = useModal();
+    const { mutate: logout } = useLogout();
 
     return (
         <>

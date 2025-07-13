@@ -58,8 +58,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }, []);
 
     // Login function
-    // const login = useCallback(async (userData: User, tokens: AuthTokens) => {
     const login = useCallback(async (tokens: AuthTokens) => {
+        console.log('tokens', tokens);
+
         try {
             await setItem('accessToken', tokens.accessToken);
             await setItem('refreshToken', tokens.refreshToken);

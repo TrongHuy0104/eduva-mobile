@@ -1,4 +1,4 @@
-import { GetStudentClassesEnrolledRequest } from '@/types/requests/get-student-classes-enrolled-request.model';
+import { GetStudentClassesEnrolledRequest } from '@/types/requests/get-student-classes-enrolled.request';
 import client from './client';
 
 export const getStudentClassesEnrolled = (
@@ -7,4 +7,8 @@ export const getStudentClassesEnrolled = (
     return client.get('/classes/enrollment', {
         params: getStudentClassesEnrolledRequest,
     });
+};
+
+export const getStudentClassById = (classId: string) => {
+    return client.get(`/classes/${classId}`);
 };
