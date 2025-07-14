@@ -78,7 +78,7 @@ const BannerCarousel = () => {
             duration: 300,
             useNativeDriver: false,
         }).start();
-    }, [activeIndex]);
+    }, [activeIndex, activeDotAnim]);
     // Animated values for dots
     const dotWidths = useRef(
         BANNERS.map((_, i) => new Animated.Value(i === 0 ? 32 : 18))
@@ -94,6 +94,10 @@ const BannerCarousel = () => {
         });
     }, [activeIndex, dotWidths]);
 
+    const stopAutoScroll = React.useCallback(() => {
+        if (intervalRef.current) clearInterval(intervalRef.current);
+    }, []);
+
     // Auto scroll logic
     const startAutoScroll = React.useCallback(() => {
         stopAutoScroll();
@@ -104,11 +108,7 @@ const BannerCarousel = () => {
                 scrollToIndex(next);
             }
         }, 3000);
-    }, [activeIndex]);
-
-    const stopAutoScroll = React.useCallback(() => {
-        if (intervalRef.current) clearInterval(intervalRef.current);
-    }, []);
+    }, [activeIndex, stopAutoScroll]);
 
     useEffect(() => {
         startAutoScroll();
@@ -195,7 +195,6 @@ const BannerCarousel = () => {
                 ))}
             </ScrollView>
             <View style={styles.dotsContainer}>
-                {/* Render các dot nhỏ có thể click */}
                 {BANNERS.map((_, idx) => (
                     <TouchableOpacity
                         key={idx}

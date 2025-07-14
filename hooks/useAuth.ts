@@ -144,6 +144,7 @@ export const useLogout = (): UseMutationResult<
         },
         onSuccess: () => {
             authLogout();
+            router.push('/(tabs)/home');
             queryClient.clear();
         },
         onError: (error) => {

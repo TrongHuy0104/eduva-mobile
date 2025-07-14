@@ -2,6 +2,7 @@ import { useLastMaterialTracking } from '@/hooks/useLastMaterialTracking';
 import { ContentType } from '@/types/enums/lesson-material.enum';
 import { LessonMaterial } from '@/types/models/lesson-material.model';
 import { FontAwesome6 } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -18,9 +19,10 @@ const Material = ({ material, classId, index, folderId }: MaterialProps) => {
     const redirect = () => {
         setLastLesson(classId, folderId, material.id);
 
-        // router.push(
-        //     `/learn/${material.id}?classId=${classId}&folderId=${folderId}`
-        // );
+        router.push(
+            // @ts-ignore
+            `/learn/${material.id}?classId=${classId}&folderId=${folderId}`
+        );
     };
 
     const getIcon = () => {

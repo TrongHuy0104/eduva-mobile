@@ -6,6 +6,7 @@ import { useLastMaterialTracking } from '@/hooks/useLastMaterialTracking';
 import { useLessonMaterials } from '@/hooks/useLessonMaterial';
 import { useToast } from '@/hooks/useToast';
 import { Image } from 'expo-image';
+import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
@@ -47,8 +48,6 @@ const ClassScreen = ({ classId }: { classId: string }) => {
             lessonMaterials.length > 0 &&
             isEnabledLoadMaterial
         ) {
-            console.log(lessonMaterials);
-
             const folderHasLesson = folders?.find(
                 (folder) => folder.countLessonMaterial > 0
             );
@@ -76,7 +75,7 @@ const ClassScreen = ({ classId }: { classId: string }) => {
 
     const redirect = async () => {
         if (studentClass?.countLessonMaterial === 0) {
-            toast.info(
+            toast.error(
                 'Lớp học trống',
                 'Chưa có bài học nào được thêm vào lớp học này!'
             );
@@ -84,15 +83,10 @@ const ClassScreen = ({ classId }: { classId: string }) => {
             const lastLesson = await getLastLesson(classId);
 
             if (lastLesson) {
-                clearAll();
-
-                //     router.push({
-                //         pathname: `/learn/${lastLesson.material}`,
-                //         query: {
-                //           classId,
-                //           folderId: lastLesson.folder,
-                //         },
-                //       });
+                router.push(
+                    // @ts-ignore
+                    `/learn/${lastLesson.material}?classId=${classId}&folderId=${lastLesson.folder}`
+                );
             } else {
                 const folderHasLesson = folders.find(
                     (folder) => folder.countLessonMaterial > 0
@@ -104,9 +98,10 @@ const ClassScreen = ({ classId }: { classId: string }) => {
 
                 console.log(lessonMaterials);
 
-                // router.push(
-                //     `/learn/${lessonMaterials[0].id}?classId=${classId}&folderId=${folderHasLesson.id}`
-                // );
+                router.push(
+                    // @ts-ignore
+                    `/learn/${lessonMaterials[0].id}?classId=${classId}&folderId=${folderHasLesson.id}`
+                );
             }
         }
     };
