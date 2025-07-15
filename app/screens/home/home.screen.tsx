@@ -27,6 +27,87 @@ const HomeScreen = () => {
         toast.errorGeneral();
     }
 
+    let subjectsRowContent;
+    if (isLoadingClasses) {
+        subjectsRowContent = Array.from({ length: 6 }).map((_, idx) => (
+            <View style={styles.subjectCol} key={idx}>
+                <SubjectCardSkeleton />
+            </View>
+        ));
+    } else if (classes.length > 0) {
+        subjectsRowContent = classes?.map(
+            (classItem: ClassModel, idx: number) => (
+                <View style={styles.subjectCol} key={classItem.id ?? idx}>
+                    <SubjectCard classItem={classItem} />
+                </View>
+            )
+        );
+    } else {
+        subjectsRowContent = (
+            <View style={styles.emptyContainer}>
+                <Image
+                    style={{
+                        width: 160,
+                        height: 160,
+                        marginHorizontal: 'auto',
+                    }}
+                    source={require('../../../assets/images/classroom-lesson-empty.svg')}
+                    contentFit="contain"
+                    transition={1000}
+                />
+                <Text style={styles.emptyTitle}>
+                    Bạn chưa tham gia lớp học nào!
+                </Text>
+                <Text style={styles.emptySubtitle}>
+                    Khi tham gia lớp, bạn sẽ thấy tất cả bài giảng, tài liệu, và
+                    video từ giáo viên tại đây. Hãy nhập mã lớp mà giáo viên đã
+                    cung cấp để bắt đầu học nhé!
+                </Text>
+                <Pressable
+                    style={({ pressed }) => [
+                        {
+                            flex: 1,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            height: windowHeight(36),
+                            backgroundColor: '#007bff',
+                            borderRadius: 999,
+                            paddingHorizontal: 10,
+                            paddingVertical: 4,
+                            marginTop: 16,
+                        },
+                        { opacity: pressed ? 0.7 : 1 },
+                    ]}
+                    onPress={() => {}}
+                >
+                    <View
+                        style={{
+                            gap: 6,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                        }}
+                    >
+                        <FontAwesome6
+                            name="plus"
+                            solid
+                            size={18}
+                            color="#fff"
+                        />
+                        <Text
+                            style={{
+                                color: '#fff',
+                                fontWeight: '600',
+                                fontSize: 16,
+                            }}
+                        >
+                            Tham gia ngay
+                        </Text>
+                    </View>
+                </Pressable>
+            </View>
+        );
+    }
+
     return (
         <ScrollView
             style={{ flex: 1, backgroundColor: '#fff' }}
@@ -72,89 +153,7 @@ const HomeScreen = () => {
                             </Pressable>
                         )}
                     </View>
-                    <View style={styles.subjectsRow}>
-                        {isLoadingClasses ? (
-                            Array.from({ length: 6 }).map((_, idx) => (
-                                <View style={styles.subjectCol} key={idx}>
-                                    <SubjectCardSkeleton />
-                                </View>
-                            ))
-                        ) : classes.length > 0 ? (
-                            classes?.map(
-                                (classItem: ClassModel, idx: number) => (
-                                    <View
-                                        style={styles.subjectCol}
-                                        key={classItem.id ?? idx}
-                                    >
-                                        <SubjectCard classItem={classItem} />
-                                    </View>
-                                )
-                            )
-                        ) : (
-                            <View style={styles.emptyContainer}>
-                                <Image
-                                    style={{
-                                        width: 160,
-                                        height: 160,
-                                        marginHorizontal: 'auto',
-                                    }}
-                                    source={require('../../../assets/images/classroom-lesson-empty.svg')}
-                                    contentFit="contain"
-                                    transition={1000}
-                                />
-                                <Text style={styles.emptyTitle}>
-                                    Bạn chưa tham gia lớp học nào!
-                                </Text>
-                                <Text style={styles.emptySubtitle}>
-                                    Khi tham gia lớp, bạn sẽ thấy tất cả bài
-                                    giảng, tài liệu, và video từ giáo viên tại
-                                    đây. Hãy nhập mã lớp mà giáo viên đã cung
-                                    cấp để bắt đầu học nhé!
-                                </Text>
-                                <Pressable
-                                    style={({ pressed }) => [
-                                        {
-                                            flex: 1,
-                                            justifyContent: 'center',
-                                            alignItems: 'center',
-                                            height: windowHeight(36),
-                                            backgroundColor: '#007bff',
-                                            borderRadius: 999,
-                                            paddingHorizontal: 10,
-                                            paddingVertical: 4,
-                                            marginTop: 16,
-                                        },
-                                        { opacity: pressed ? 0.7 : 1 },
-                                    ]}
-                                    onPress={() => {}}
-                                >
-                                    <View
-                                        style={{
-                                            gap: 6,
-                                            flexDirection: 'row',
-                                            alignItems: 'center',
-                                        }}
-                                    >
-                                        <FontAwesome6
-                                            name="plus"
-                                            solid
-                                            size={18}
-                                            color="#fff"
-                                        />
-                                        <Text
-                                            style={{
-                                                color: '#fff',
-                                                fontWeight: '600',
-                                                fontSize: 16,
-                                            }}
-                                        >
-                                            Tham gia ngay
-                                        </Text>
-                                    </View>
-                                </Pressable>
-                            </View>
-                        )}
-                    </View>
+                    <View style={styles.subjectsRow}>{subjectsRowContent}</View>
                 </View>
             )}
         </ScrollView>

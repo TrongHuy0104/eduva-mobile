@@ -16,6 +16,14 @@ interface MaterialProps {
 const Material = ({ material, classId, index, folderId }: MaterialProps) => {
     const { setLastLesson } = useLastMaterialTracking();
 
+    const formatSeconds = (seconds: number) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins.toString().padStart(2, '0')}:${secs
+            .toString()
+            .padStart(2, '0')}`;
+    };
+
     const redirect = () => {
         setLastLesson(classId, folderId, material.id);
 
@@ -60,7 +68,7 @@ const Material = ({ material, classId, index, folderId }: MaterialProps) => {
                 </Text>
             </View>
             <Text style={{ fontSize: 14, color: '#242424' }} numberOfLines={1}>
-                00:00
+                {formatSeconds(material.duration)}
             </Text>
         </Pressable>
     );

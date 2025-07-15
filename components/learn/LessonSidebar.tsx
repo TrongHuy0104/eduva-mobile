@@ -114,22 +114,26 @@ const LessonSidebar: React.FC<LessonSidebarProps> = ({
                 <View
                     style={{ overflowY: 'auto', overscrollBehavior: 'contain' }}
                 >
-                    {folders.map((folder, index) => (
-                        <Folder
-                            key={folder.id}
-                            index={index}
-                            folder={folder}
-                            onClose={onClose}
-                            isActive={
-                                folder.id ===
-                                (typeof folderId === 'string'
-                                    ? folderId
-                                    : Array.isArray(folderId)
-                                    ? folderId[0]
-                                    : undefined)
-                            }
-                        />
-                    ))}
+                    {folders.map((folder, index) => {
+                        let currentFolderId;
+                        if (typeof folderId === 'string') {
+                            currentFolderId = folderId;
+                        } else if (Array.isArray(folderId)) {
+                            currentFolderId = folderId[0];
+                        } else {
+                            currentFolderId = undefined;
+                        }
+                        const isActive = folder.id === currentFolderId;
+                        return (
+                            <Folder
+                                key={folder.id}
+                                index={index}
+                                folder={folder}
+                                onClose={onClose}
+                                isActive={isActive}
+                            />
+                        );
+                    })}
                 </View>
             </Animated.View>
         </Modal>

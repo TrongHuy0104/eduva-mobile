@@ -1,7 +1,9 @@
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { StyleSheet, View } from 'react-native';
 
-export default function VideoViewer({ videoSource }: { videoSource: string }) {
+export default function VideoViewer({
+    videoSource,
+}: Readonly<{ videoSource: string }>) {
     const player = useVideoPlayer(videoSource, (player) => {
         player.loop = true;
         player.play();

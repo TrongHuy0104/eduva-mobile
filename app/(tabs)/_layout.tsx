@@ -10,6 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { moderateScale } from 'react-native-size-matters';
 
 const Layout = () => {
+    const { user } = useAuth();
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
             <StatusBar barStyle="light-content" backgroundColor="#000" />
@@ -17,7 +18,7 @@ const Layout = () => {
 
             <Tabs
                 screenOptions={{ headerShown: false }}
-                tabBar={(props) => <CustomTabBar {...props} />}
+                tabBar={(props) => <CustomTabBar {...props} user={user} />}
             >
                 <Tabs.Screen name="home" />
                 <Tabs.Screen name="profile/index" />
@@ -28,9 +29,7 @@ const Layout = () => {
 
 export default Layout;
 
-const CustomTabBar = ({ state }: any) => {
-    const { user } = useAuth();
-
+const CustomTabBar = ({ state, user }: any) => {
     return (
         <View
             style={{

@@ -102,13 +102,6 @@ const AudioListener: React.FC<AudioListenerProps> = ({ uri }) => {
         }
     };
 
-    const handleVolumeChange = async (value: number) => {
-        setVolume(value);
-        if (sound) {
-            await sound.setVolumeAsync(value);
-        }
-    };
-
     const handleSpeedChange = async (rate: number) => {
         setPlaybackRate(rate);
         setShowSpeedMenu(false);
@@ -117,7 +110,6 @@ const AudioListener: React.FC<AudioListenerProps> = ({ uri }) => {
         }
     };
 
-    // Hàm chuyển đổi mức âm lượng
     const handleCycleVolume = () => {
         let newVolume = 0;
         if (volume === 0) {

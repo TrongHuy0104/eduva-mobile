@@ -34,6 +34,42 @@ const Folder = ({ folder, classId, index }: FolderProps) => {
 
     if (error) toast.errorGeneral();
 
+    let lessonMaterialsContent = null;
+    if (!isCollapsed) {
+        if (isPending) {
+            lessonMaterialsContent = (
+                <SkeletonLoading background="#e0e0e0" highlight="#f5f5f5">
+                    <View
+                        style={{
+                            position: 'relative',
+                            width: '100%',
+                            marginTop: 8,
+                            backgroundColor: '#00000008',
+                            overflow: 'hidden',
+                        }}
+                    >
+                        {[1, 2, 3].map((index) => (
+                            <View
+                                key={index}
+                                style={styles.materialContainer}
+                            ></View>
+                        ))}
+                    </View>
+                </SkeletonLoading>
+            );
+        } else if (lessonMaterials && lessonMaterials.length > 0) {
+            lessonMaterialsContent = lessonMaterials.map((material, index) => (
+                <Material
+                    key={material.id}
+                    material={material}
+                    classId={classId}
+                    index={index}
+                    folderId={folder.id}
+                />
+            ));
+        }
+    }
+
     return (
         <View style={styles.folderContainer}>
             <Pressable
@@ -65,43 +101,7 @@ const Folder = ({ folder, classId, index }: FolderProps) => {
             </Pressable>
 
             {/* Lesson Materials Section */}
-            {!isCollapsed && (
-                <View>
-                    {isPending ? (
-                        <SkeletonLoading
-                            background="#e0e0e0"
-                            highlight="#f5f5f5"
-                        >
-                            <View
-                                style={{
-                                    position: 'relative',
-                                    width: '100%',
-                                    marginTop: 8,
-                                    backgroundColor: '#00000008',
-                                    overflow: 'hidden',
-                                }}
-                            >
-                                {[1, 2, 3].map((index) => (
-                                    <View
-                                        key={index}
-                                        style={styles.materialContainer}
-                                    ></View>
-                                ))}
-                            </View>
-                        </SkeletonLoading>
-                    ) : lessonMaterials && lessonMaterials.length > 0 ? (
-                        lessonMaterials.map((material, index) => (
-                            <Material
-                                key={material.id}
-                                material={material}
-                                classId={classId}
-                                index={index}
-                                folderId={folder.id}
-                            />
-                        ))
-                    ) : null}
-                </View>
-            )}
+            {!isCollapsed && <View>{lessonMaterialsContent}</View>}
         </View>
     );
 };
