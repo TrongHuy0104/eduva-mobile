@@ -152,45 +152,48 @@ const UserActions = () => {
                                 setModalVisible(false);
                             }}
                         >
-                            {({ pressed }) => (
-                                <View style={styles.modalItemContent}>
-                                    <FontAwesome6
-                                        name="user"
-                                        solid
-                                        size={16}
-                                        color={
-                                            pressed
-                                                ? isLearnRoute
-                                                    ? '#fff'
-                                                    : '#292929'
-                                                : isLearnRoute
-                                                ? '#fffc'
-                                                : '#666'
-                                        }
-                                        style={styles.modalItemIcon}
-                                    />
-                                    <Text
-                                        style={[
-                                            styles.modalItemText,
-                                            {
-                                                color: isLearnRoute
-                                                    ? '#fffc'
-                                                    : '#666',
-                                            },
-                                            pressed &&
-                                                isLearnRoute && {
-                                                    color: '#fff',
+                            {({ pressed }) => {
+                                const getIconColor = (pressed: boolean) => {
+                                    if (pressed) {
+                                        return isLearnRoute
+                                            ? '#fff'
+                                            : '#292929';
+                                    } else {
+                                        return isLearnRoute ? '#fffc' : '#666';
+                                    }
+                                };
+                                return (
+                                    <View style={styles.modalItemContent}>
+                                        <FontAwesome6
+                                            name="user"
+                                            solid
+                                            size={16}
+                                            color={getIconColor(pressed)}
+                                            style={styles.modalItemIcon}
+                                        />
+                                        <Text
+                                            style={[
+                                                styles.modalItemText,
+                                                {
+                                                    color: isLearnRoute
+                                                        ? '#fffc'
+                                                        : '#666',
                                                 },
-                                            pressed &&
-                                                !isLearnRoute && {
-                                                    color: '#292929',
-                                                },
-                                        ]}
-                                    >
-                                        Trang cá nhân
-                                    </Text>
-                                </View>
-                            )}
+                                                pressed &&
+                                                    isLearnRoute && {
+                                                        color: '#fff',
+                                                    },
+                                                pressed &&
+                                                    !isLearnRoute && {
+                                                        color: '#292929',
+                                                    },
+                                            ]}
+                                        >
+                                            Trang cá nhân
+                                        </Text>
+                                    </View>
+                                );
+                            }}
                         </Pressable>
 
                         <Pressable
@@ -199,45 +202,48 @@ const UserActions = () => {
                                 setModalVisible(false);
                             }}
                         >
-                            {({ pressed }) => (
-                                <View style={styles.modalItemContent}>
-                                    <FontAwesome6
-                                        name="bell"
-                                        solid
-                                        size={16}
-                                        color={
-                                            pressed
-                                                ? isLearnRoute
-                                                    ? '#fff'
-                                                    : '#292929'
-                                                : isLearnRoute
-                                                ? '#fffc'
-                                                : '#666'
-                                        }
-                                        style={styles.modalItemIcon}
-                                    />
-                                    <Text
-                                        style={[
-                                            styles.modalItemText,
-                                            {
-                                                color: isLearnRoute
-                                                    ? '#fffc'
-                                                    : '#666',
-                                            },
-                                            pressed &&
-                                                isLearnRoute && {
-                                                    color: '#fff',
+                            {({ pressed }) => {
+                                const getIconColor = (pressed: boolean) => {
+                                    if (pressed) {
+                                        return isLearnRoute
+                                            ? '#fff'
+                                            : '#292929';
+                                    } else {
+                                        return isLearnRoute ? '#fffc' : '#666';
+                                    }
+                                };
+                                return (
+                                    <View style={styles.modalItemContent}>
+                                        <FontAwesome6
+                                            name="bell"
+                                            solid
+                                            size={16}
+                                            color={getIconColor(pressed)}
+                                            style={styles.modalItemIcon}
+                                        />
+                                        <Text
+                                            style={[
+                                                styles.modalItemText,
+                                                {
+                                                    color: isLearnRoute
+                                                        ? '#fffc'
+                                                        : '#666',
                                                 },
-                                            pressed &&
-                                                !isLearnRoute && {
-                                                    color: '#292929',
-                                                },
-                                        ]}
-                                    >
-                                        Thông báo
-                                    </Text>
-                                </View>
-                            )}
+                                                pressed &&
+                                                    isLearnRoute && {
+                                                        color: '#fff',
+                                                    },
+                                                pressed &&
+                                                    !isLearnRoute && {
+                                                        color: '#292929',
+                                                    },
+                                            ]}
+                                        >
+                                            Thông báo
+                                        </Text>
+                                    </View>
+                                );
+                            }}
                         </Pressable>
 
                         <View
@@ -257,44 +263,47 @@ const UserActions = () => {
                                 setModalVisible(false);
                             }}
                         >
-                            {({ pressed }) => (
-                                <View style={styles.modalItemContent}>
-                                    <FontAwesome6
-                                        name="graduation-cap"
-                                        size={16}
-                                        color={
-                                            pressed
-                                                ? isLearnRoute
-                                                    ? '#fff'
-                                                    : '#292929'
-                                                : isLearnRoute
-                                                ? '#fffc'
-                                                : '#666'
-                                        }
-                                        style={styles.modalItemIcon}
-                                    />
-                                    <Text
-                                        style={[
-                                            styles.modalItemText,
-                                            {
-                                                color: isLearnRoute
-                                                    ? '#fffc'
-                                                    : '#666',
-                                            },
-                                            pressed &&
-                                                isLearnRoute && {
-                                                    color: '#fff',
+                            {({ pressed }) => {
+                                const getIconColor = (pressed: boolean) => {
+                                    if (pressed) {
+                                        return isLearnRoute
+                                            ? '#fff'
+                                            : '#292929';
+                                    } else {
+                                        return isLearnRoute ? '#fffc' : '#666';
+                                    }
+                                };
+                                return (
+                                    <View style={styles.modalItemContent}>
+                                        <FontAwesome6
+                                            name="graduation-cap"
+                                            size={16}
+                                            color={getIconColor(pressed)}
+                                            style={styles.modalItemIcon}
+                                        />
+                                        <Text
+                                            style={[
+                                                styles.modalItemText,
+                                                {
+                                                    color: isLearnRoute
+                                                        ? '#fffc'
+                                                        : '#666',
                                                 },
-                                            pressed &&
-                                                !isLearnRoute && {
-                                                    color: '#292929',
-                                                },
-                                        ]}
-                                    >
-                                        Lớp học của tôi
-                                    </Text>
-                                </View>
-                            )}
+                                                pressed &&
+                                                    isLearnRoute && {
+                                                        color: '#fff',
+                                                    },
+                                                pressed &&
+                                                    !isLearnRoute && {
+                                                        color: '#292929',
+                                                    },
+                                            ]}
+                                        >
+                                            Lớp học của tôi
+                                        </Text>
+                                    </View>
+                                );
+                            }}
                         </Pressable>
 
                         <View
@@ -316,44 +325,47 @@ const UserActions = () => {
                                 setModalVisible(false);
                             }}
                         >
-                            {({ pressed }) => (
-                                <View style={styles.modalItemContent}>
-                                    <FontAwesome6
-                                        name="gear"
-                                        size={16}
-                                        color={
-                                            pressed
-                                                ? isLearnRoute
-                                                    ? '#fff'
-                                                    : '#292929'
-                                                : isLearnRoute
-                                                ? '#fffc'
-                                                : '#666'
-                                        }
-                                        style={styles.modalItemIcon}
-                                    />
-                                    <Text
-                                        style={[
-                                            styles.modalItemText,
-                                            {
-                                                color: isLearnRoute
-                                                    ? '#fffc'
-                                                    : '#666',
-                                            },
-                                            pressed &&
-                                                isLearnRoute && {
-                                                    color: '#fff',
+                            {({ pressed }) => {
+                                const getIconColor = (pressed: boolean) => {
+                                    if (pressed) {
+                                        return isLearnRoute
+                                            ? '#fff'
+                                            : '#292929';
+                                    } else {
+                                        return isLearnRoute ? '#fffc' : '#666';
+                                    }
+                                };
+                                return (
+                                    <View style={styles.modalItemContent}>
+                                        <FontAwesome6
+                                            name="gear"
+                                            size={16}
+                                            color={getIconColor(pressed)}
+                                            style={styles.modalItemIcon}
+                                        />
+                                        <Text
+                                            style={[
+                                                styles.modalItemText,
+                                                {
+                                                    color: isLearnRoute
+                                                        ? '#fffc'
+                                                        : '#666',
                                                 },
-                                            pressed &&
-                                                !isLearnRoute && {
-                                                    color: '#292929',
-                                                },
-                                        ]}
-                                    >
-                                        Cài đặt
-                                    </Text>
-                                </View>
-                            )}
+                                                pressed &&
+                                                    isLearnRoute && {
+                                                        color: '#fff',
+                                                    },
+                                                pressed &&
+                                                    !isLearnRoute && {
+                                                        color: '#292929',
+                                                    },
+                                            ]}
+                                        >
+                                            Cài đặt
+                                        </Text>
+                                    </View>
+                                );
+                            }}
                         </Pressable>
                         <Pressable
                             style={styles.modalItem}
@@ -362,44 +374,47 @@ const UserActions = () => {
                                 logout();
                             }}
                         >
-                            {({ pressed }) => (
-                                <View style={styles.modalItemContent}>
-                                    <FontAwesome6
-                                        name="arrow-right-from-bracket"
-                                        size={16}
-                                        color={
-                                            pressed
-                                                ? isLearnRoute
-                                                    ? '#fff'
-                                                    : '#292929'
-                                                : isLearnRoute
-                                                ? '#fffc'
-                                                : '#666'
-                                        }
-                                        style={styles.modalItemIcon}
-                                    />
-                                    <Text
-                                        style={[
-                                            styles.modalItemText,
-                                            {
-                                                color: isLearnRoute
-                                                    ? '#fffc'
-                                                    : '#666',
-                                            },
-                                            pressed &&
-                                                isLearnRoute && {
-                                                    color: '#fff',
+                            {({ pressed }) => {
+                                const getIconColor = (pressed: boolean) => {
+                                    if (pressed) {
+                                        return isLearnRoute
+                                            ? '#fff'
+                                            : '#292929';
+                                    } else {
+                                        return isLearnRoute ? '#fffc' : '#666';
+                                    }
+                                };
+                                return (
+                                    <View style={styles.modalItemContent}>
+                                        <FontAwesome6
+                                            name="arrow-right-from-bracket"
+                                            size={16}
+                                            color={getIconColor(pressed)}
+                                            style={styles.modalItemIcon}
+                                        />
+                                        <Text
+                                            style={[
+                                                styles.modalItemText,
+                                                {
+                                                    color: isLearnRoute
+                                                        ? '#fffc'
+                                                        : '#666',
                                                 },
-                                            pressed &&
-                                                !isLearnRoute && {
-                                                    color: '#292929',
-                                                },
-                                        ]}
-                                    >
-                                        Đăng xuất
-                                    </Text>
-                                </View>
-                            )}
+                                                pressed &&
+                                                    isLearnRoute && {
+                                                        color: '#fff',
+                                                    },
+                                                pressed &&
+                                                    !isLearnRoute && {
+                                                        color: '#292929',
+                                                    },
+                                            ]}
+                                        >
+                                            Đăng xuất
+                                        </Text>
+                                    </View>
+                                );
+                            }}
                         </Pressable>
                     </Pressable>
                 </Pressable>

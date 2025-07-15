@@ -39,12 +39,14 @@ const PasswordStrength = ({ password }: PasswordStrengthProps) => {
     const strength = getStrengthLevel(password);
     const { text, color } = getStrengthText(strength);
 
+    const barKeys = ['minLength', 'specialChar', 'number', 'upperCase'];
+
     return (
         <View style={styles.container}>
             <View style={styles.strengthBars}>
-                {[...Array(4)].map((_, index) => (
+                {barKeys.map((key, index) => (
                     <View
-                        key={index}
+                        key={key}
                         style={[
                             styles.strengthBar,
                             {

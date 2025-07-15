@@ -5,7 +5,11 @@ import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import GradientButton from '../GradientButton';
 
-const Footer = () => {
+interface FooterProps {
+    onSidebarOpen?: () => void;
+}
+
+const Footer = ({ onSidebarOpen }: FooterProps) => {
     return (
         <BlurView intensity={80} tint="dark" style={styles.container}>
             <View style={styles.overlay} />
@@ -32,6 +36,7 @@ const Footer = () => {
                     styles.sidebarBtn,
                     { backgroundColor: pressed ? '#2e4a8d' : '#292d35' },
                 ]}
+                onPress={onSidebarOpen}
             >
                 <Image
                     style={{

@@ -1,11 +1,13 @@
 import AudioListener from '@/components/learn/AudioListener';
 import DocViewer from '@/components/learn/DocViewer';
 import Footer from '@/components/learn/Footer';
+import LessonSidebar from '@/components/learn/LessonSidebar';
 import PdfViewer from '@/components/learn/PdfViewer';
 import VideoViewer from '@/components/learn/VideoViewer';
+import { useFolders } from '@/hooks/useFolder';
 import { useLessonMaterialById } from '@/hooks/useLessonMaterial';
 import { ContentType } from '@/types/enums/lesson-material.enum';
-import React from 'react';
+import React, { useState } from 'react';
 import { Dimensions, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 interface LearnScreenProps {
@@ -16,9 +18,12 @@ interface LearnScreenProps {
 
 const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
     const { data: material } = useLessonMaterialById(materialId);
+    const { data: folders } = useFolders(classId);
+
+    const [sidebarVisible, setSidebarVisible] = useState(false);
 
     const formatUpdateDate = (input?: string | null): string => {
-        if (!input) return 'Bài học chưa từng được cập nhật';
+        if (!input) return 'Bài học chưa được cập nhật';
 
         const date = new Date(input);
         if (isNaN(date.getTime())) return 'Định dạng ngày không hợp lệ';
@@ -93,7 +98,12 @@ const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
                 </View>
             </ScrollView>
 
-            <Footer />
+            <Footer onSidebarOpen={() => setSidebarVisible(true)} />
+            <LessonSidebar
+                folders={folders}
+                visible={sidebarVisible}
+                onClose={() => setSidebarVisible(false)}
+            />
         </View>
     );
 };

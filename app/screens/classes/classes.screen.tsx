@@ -61,7 +61,7 @@ const ClassesScreen = () => {
     const renderSkeleton = () => (
         <View style={styles.classesRow}>
             {Array.from({ length: 6 }).map((_, idx) => (
-                <View style={styles.classItem} key={idx}>
+                <View style={styles.classItem} key={`class-${idx}`}>
                     <ClassCardSkeleton />
                 </View>
             ))}

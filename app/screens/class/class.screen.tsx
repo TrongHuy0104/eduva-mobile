@@ -38,8 +38,7 @@ const ClassScreen = ({ classId }: { classId: string }) => {
             isEnabledLoadMaterial
         );
 
-    const { setLastLesson, getLastLesson, clearAll } =
-        useLastMaterialTracking();
+    const { setLastLesson, getLastLesson } = useLastMaterialTracking();
 
     // Track lesson materials when they are successfully loaded
     useEffect(() => {
@@ -95,8 +94,6 @@ const ClassScreen = ({ classId }: { classId: string }) => {
                 if (!folderHasLesson) return;
 
                 setIsEnabledLoadMaterial(true);
-
-                console.log(lessonMaterials);
 
                 router.push(
                     // @ts-ignore
