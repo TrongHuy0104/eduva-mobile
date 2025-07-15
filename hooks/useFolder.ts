@@ -18,7 +18,7 @@ export const useFolders = (classId: string, params: UseFolderParams = {}) => {
         AxiosResponse<BaseResponse<Folder[]>>,
         Error
     >({
-        queryKey: ['folders', params],
+        queryKey: ['folders', params, classId],
         queryFn: () => {
             const request: GetFoldersRequest = {
                 ownerType: params.ownerType ?? FolderOwnerType.Class,

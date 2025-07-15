@@ -16,7 +16,7 @@ const UnauthorizePage = () => {
             <SafeAreaView style={{ flex: 1 }}>
                 <View style={styles.logoWrapper}>
                     <Pressable
-                        onPress={() => router.push('/(tabs)')}
+                        onPress={() => router.push('/(tabs)/home')}
                         style={{ display: 'flex', borderRadius: 10 }}
                     >
                         <Image
@@ -58,7 +58,7 @@ const UnauthorizePage = () => {
                         { opacity: pressed ? 0.7 : 1 },
                     ]}
                     onPress={() => {
-                        router.push('/(tabs)');
+                        router.push('/(tabs)/home');
                     }}
                 >
                     <Text
