@@ -4,13 +4,19 @@ import { useModal } from '@/contexts/modal.context';
 import { useLogout } from '@/hooks/useAuth';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
+import { router, usePathname } from 'expo-router';
 import React, { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+// Available icon libraries you can use:
+import { FontAwesome6 } from '@expo/vector-icons';
 import AuthFormWrapper from './auth/AuthFormWrapper';
 
 const UserActions = () => {
     const [modalVisible, setModalVisible] = useState(false);
+    const pathname = usePathname();
+
+    const isLearnRoute = pathname.startsWith('/learn');
+
     const { user } = useAuth();
     const { openModal } = useModal();
     const { mutate: logout } = useLogout();
@@ -41,10 +47,10 @@ const UserActions = () => {
                             flex: 1,
                             justifyContent: 'center',
                             alignItems: 'center',
-                            height: windowHeight(32),
+                            height: windowHeight(26),
                             backgroundColor: '#007bff',
                             borderRadius: 999,
-                            paddingHorizontal: 10,
+                            paddingHorizontal: 8,
                             paddingVertical: 4,
                         },
                         { opacity: pressed ? 0.7 : 1 },
@@ -67,7 +73,7 @@ const UserActions = () => {
             {/* Modal */}
             <Modal
                 visible={modalVisible}
-                style={{ maxWidth: '50%' }}
+                style={{ maxWidth: '45%' }}
                 transparent
                 animationType="fade"
                 onRequestClose={() => setModalVisible(false)}
@@ -77,7 +83,14 @@ const UserActions = () => {
                     onPress={() => setModalVisible(false)}
                 >
                     <Pressable
-                        style={styles.modalContent}
+                        style={[
+                            styles.modalContent,
+                            {
+                                backgroundColor: isLearnRoute
+                                    ? '#191d1e'
+                                    : '#fff',
+                            },
+                        ]}
                         onPress={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
                     >
                         <View style={styles.modalHeader}>
@@ -94,8 +107,8 @@ const UserActions = () => {
                                     style={[
                                         styles.avatar,
                                         {
-                                            width: windowWidth(66),
-                                            height: windowWidth(66),
+                                            width: windowWidth(52),
+                                            height: windowWidth(52),
                                         },
                                     ]}
                                     source={user?.avatarUrl}
@@ -104,19 +117,32 @@ const UserActions = () => {
                             </LinearGradient>
                             <View style={{ marginLeft: windowWidth(20) }}>
                                 <Text
-                                    style={styles.modalName}
+                                    style={[
+                                        styles.modalName,
+                                        {
+                                            color: isLearnRoute
+                                                ? '#fffc'
+                                                : '#1d2129',
+                                        },
+                                    ]}
                                     ellipsizeMode="tail"
-                                    numberOfLines={1}
+                                    numberOfLines={2}
                                 >
                                     {user?.fullName}
                                 </Text>
-                                {/* <Text style={styles.modalUsername}>
-                                    {user?.email}
-                                </Text> */}
                             </View>
                         </View>
 
-                        <View style={styles.modalDivider} />
+                        <View
+                            style={[
+                                styles.modalDivider,
+                                {
+                                    backgroundColor: isLearnRoute
+                                        ? '#323c4a'
+                                        : '#0000000d',
+                                },
+                            ]}
+                        />
 
                         <Pressable
                             style={styles.modalItem}
@@ -127,14 +153,43 @@ const UserActions = () => {
                             }}
                         >
                             {({ pressed }) => (
-                                <Text
-                                    style={[
-                                        styles.modalItemText,
-                                        pressed && { color: '#292929' },
-                                    ]}
-                                >
-                                    Trang cá nhân
-                                </Text>
+                                <View style={styles.modalItemContent}>
+                                    <FontAwesome6
+                                        name="user"
+                                        solid
+                                        size={16}
+                                        color={
+                                            pressed
+                                                ? isLearnRoute
+                                                    ? '#fff'
+                                                    : '#292929'
+                                                : isLearnRoute
+                                                ? '#fffc'
+                                                : '#666'
+                                        }
+                                        style={styles.modalItemIcon}
+                                    />
+                                    <Text
+                                        style={[
+                                            styles.modalItemText,
+                                            {
+                                                color: isLearnRoute
+                                                    ? '#fffc'
+                                                    : '#666',
+                                            },
+                                            pressed &&
+                                                isLearnRoute && {
+                                                    color: '#fff',
+                                                },
+                                            pressed &&
+                                                !isLearnRoute && {
+                                                    color: '#292929',
+                                                },
+                                        ]}
+                                    >
+                                        Trang cá nhân
+                                    </Text>
+                                </View>
                             )}
                         </Pressable>
 
@@ -145,18 +200,56 @@ const UserActions = () => {
                             }}
                         >
                             {({ pressed }) => (
-                                <Text
-                                    style={[
-                                        styles.modalItemText,
-                                        pressed && { color: '#292929' },
-                                    ]}
-                                >
-                                    Thông báo
-                                </Text>
+                                <View style={styles.modalItemContent}>
+                                    <FontAwesome6
+                                        name="bell"
+                                        solid
+                                        size={16}
+                                        color={
+                                            pressed
+                                                ? isLearnRoute
+                                                    ? '#fff'
+                                                    : '#292929'
+                                                : isLearnRoute
+                                                ? '#fffc'
+                                                : '#666'
+                                        }
+                                        style={styles.modalItemIcon}
+                                    />
+                                    <Text
+                                        style={[
+                                            styles.modalItemText,
+                                            {
+                                                color: isLearnRoute
+                                                    ? '#fffc'
+                                                    : '#666',
+                                            },
+                                            pressed &&
+                                                isLearnRoute && {
+                                                    color: '#fff',
+                                                },
+                                            pressed &&
+                                                !isLearnRoute && {
+                                                    color: '#292929',
+                                                },
+                                        ]}
+                                    >
+                                        Thông báo
+                                    </Text>
+                                </View>
                             )}
                         </Pressable>
 
-                        <View style={styles.modalDivider} />
+                        <View
+                            style={[
+                                styles.modalDivider,
+                                {
+                                    backgroundColor: isLearnRoute
+                                        ? '#323c4a'
+                                        : '#0000000d',
+                                },
+                            ]}
+                        />
 
                         <Pressable
                             style={styles.modalItem}
@@ -165,18 +258,55 @@ const UserActions = () => {
                             }}
                         >
                             {({ pressed }) => (
-                                <Text
-                                    style={[
-                                        styles.modalItemText,
-                                        pressed && { color: '#292929' },
-                                    ]}
-                                >
-                                    Môn học của tôi
-                                </Text>
+                                <View style={styles.modalItemContent}>
+                                    <FontAwesome6
+                                        name="graduation-cap"
+                                        size={16}
+                                        color={
+                                            pressed
+                                                ? isLearnRoute
+                                                    ? '#fff'
+                                                    : '#292929'
+                                                : isLearnRoute
+                                                ? '#fffc'
+                                                : '#666'
+                                        }
+                                        style={styles.modalItemIcon}
+                                    />
+                                    <Text
+                                        style={[
+                                            styles.modalItemText,
+                                            {
+                                                color: isLearnRoute
+                                                    ? '#fffc'
+                                                    : '#666',
+                                            },
+                                            pressed &&
+                                                isLearnRoute && {
+                                                    color: '#fff',
+                                                },
+                                            pressed &&
+                                                !isLearnRoute && {
+                                                    color: '#292929',
+                                                },
+                                        ]}
+                                    >
+                                        Lớp học của tôi
+                                    </Text>
+                                </View>
                             )}
                         </Pressable>
 
-                        <View style={styles.modalDivider} />
+                        <View
+                            style={[
+                                styles.modalDivider,
+                                {
+                                    backgroundColor: isLearnRoute
+                                        ? '#323c4a'
+                                        : '#0000000d',
+                                },
+                            ]}
+                        />
 
                         <Pressable
                             style={styles.modalItem}
@@ -187,14 +317,42 @@ const UserActions = () => {
                             }}
                         >
                             {({ pressed }) => (
-                                <Text
-                                    style={[
-                                        styles.modalItemText,
-                                        pressed && { color: '#292929' },
-                                    ]}
-                                >
-                                    Cài đặt
-                                </Text>
+                                <View style={styles.modalItemContent}>
+                                    <FontAwesome6
+                                        name="gear"
+                                        size={16}
+                                        color={
+                                            pressed
+                                                ? isLearnRoute
+                                                    ? '#fff'
+                                                    : '#292929'
+                                                : isLearnRoute
+                                                ? '#fffc'
+                                                : '#666'
+                                        }
+                                        style={styles.modalItemIcon}
+                                    />
+                                    <Text
+                                        style={[
+                                            styles.modalItemText,
+                                            {
+                                                color: isLearnRoute
+                                                    ? '#fffc'
+                                                    : '#666',
+                                            },
+                                            pressed &&
+                                                isLearnRoute && {
+                                                    color: '#fff',
+                                                },
+                                            pressed &&
+                                                !isLearnRoute && {
+                                                    color: '#292929',
+                                                },
+                                        ]}
+                                    >
+                                        Cài đặt
+                                    </Text>
+                                </View>
                             )}
                         </Pressable>
                         <Pressable
@@ -205,14 +363,42 @@ const UserActions = () => {
                             }}
                         >
                             {({ pressed }) => (
-                                <Text
-                                    style={[
-                                        styles.modalItemText,
-                                        pressed && { color: '#292929' },
-                                    ]}
-                                >
-                                    Đăng xuất
-                                </Text>
+                                <View style={styles.modalItemContent}>
+                                    <FontAwesome6
+                                        name="arrow-right-from-bracket"
+                                        size={16}
+                                        color={
+                                            pressed
+                                                ? isLearnRoute
+                                                    ? '#fff'
+                                                    : '#292929'
+                                                : isLearnRoute
+                                                ? '#fffc'
+                                                : '#666'
+                                        }
+                                        style={styles.modalItemIcon}
+                                    />
+                                    <Text
+                                        style={[
+                                            styles.modalItemText,
+                                            {
+                                                color: isLearnRoute
+                                                    ? '#fffc'
+                                                    : '#666',
+                                            },
+                                            pressed &&
+                                                isLearnRoute && {
+                                                    color: '#fff',
+                                                },
+                                            pressed &&
+                                                !isLearnRoute && {
+                                                    color: '#292929',
+                                                },
+                                        ]}
+                                    >
+                                        Đăng xuất
+                                    </Text>
+                                </View>
                             )}
                         </Pressable>
                     </Pressable>
@@ -233,8 +419,8 @@ const styles = StyleSheet.create({
         borderRadius: 9999,
     },
     avatar: {
-        width: windowWidth(52),
-        height: windowWidth(52),
+        width: windowWidth(46),
+        height: windowWidth(46),
         borderRadius: 9999,
     },
     modalOverlay: {
@@ -253,8 +439,8 @@ const styles = StyleSheet.create({
         paddingVertical: windowWidth(10),
         paddingHorizontal: windowWidth(24),
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: -4 },
-        shadowOpacity: 0.2,
+        shadowOffset: { width: 4, height: -4 },
+        shadowOpacity: 0.4,
         shadowRadius: 32,
         elevation: 5,
     },
@@ -266,11 +452,7 @@ const styles = StyleSheet.create({
     modalName: {
         fontWeight: 'bold',
         fontSize: 16,
-        maxWidth: 200,
-    },
-    modalUsername: {
-        color: '#888',
-        fontSize: 14,
+        maxWidth: 120,
     },
     modalDivider: {
         height: 1,
@@ -279,8 +461,14 @@ const styles = StyleSheet.create({
     },
     modalItem: {
         paddingVertical: 8,
-
         paddingHorizontal: windowWidth(12),
+    },
+    modalItemContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    modalItemIcon: {
+        marginRight: 12,
     },
     modalItemText: {
         fontSize: 14,
