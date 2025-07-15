@@ -1,24 +1,75 @@
+import SubjectCard from '@/components/ClassCard';
+import SubjectCardSkeleton from '@/components/skeleton/ClassCardSkeleton';
+import { useClass } from '@/hooks/useClass';
+import { ClassModel } from '@/types/models/class.model';
 import { FontAwesome6 } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-// import ClassCard from '../ClassCard';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 const Activity = () => {
+    const {
+        data: classes,
+        isPending: isLoadingClasses,
+        totalCount,
+    } = useClass();
+
     return (
         <View style={styles.container}>
             <View style={styles.tabs}>
                 <View style={[styles.tab, styles.tabActive]}>
                     <FontAwesome6 name="book" solid size={14} color="#000" />
-                    <Text style={styles.tabTitle}>Khóa học đã đăng ký (9)</Text>
+                    <Text style={styles.tabTitle}>
+                        Lớp học đã đăng ký ({totalCount})
+                    </Text>
                 </View>
-            </View>
 
-            <View style={[styles.subjectsRow, { marginTop: 24 }]}>
-                {Array.from({ length: 10 }).map((_, idx) => (
-                    <View style={styles.subjectCol} key={idx}>
-                        {/* <ClassCard /> */}
-                    </View>
-                ))}
+                {!isLoadingClasses && classes.length > 0 && (
+                    <Pressable
+                        style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            marginLeft: 'auto',
+                            paddingRight: 8,
+                        }}
+                        onPress={() => router.push('/(tabs)/home/classes')}
+                    >
+                        <Text
+                            style={{
+                                color: '#2093e7',
+                                fontWeight: '500',
+                                fontSize: 17,
+                                marginRight: 4,
+                            }}
+                        >
+                            Xem tất cả ({totalCount})
+                        </Text>
+                        <View style={{ marginTop: 3 }}>
+                            <FontAwesome6
+                                name="chevron-right"
+                                solid
+                                size={17}
+                                color="#2093e7"
+                            />
+                        </View>
+                    </Pressable>
+                )}
+            </View>
+            <View style={styles.subjectsRow}>
+                {isLoadingClasses
+                    ? Array.from({ length: 6 }).map((_, idx) => (
+                          <View style={styles.subjectCol} key={idx}>
+                              <SubjectCardSkeleton />
+                          </View>
+                      ))
+                    : classes?.map((classItem: ClassModel, idx: number) => (
+                          <View
+                              style={styles.subjectCol}
+                              key={classItem.id ?? idx}
+                          >
+                              <SubjectCard classItem={classItem} />
+                          </View>
+                      ))}
             </View>
         </View>
     );

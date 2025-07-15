@@ -4,7 +4,6 @@ import SubjectCardSkeleton from '@/components/skeleton/ClassCardSkeleton';
 import { windowHeight } from '@/constants/app.constants';
 import { useAuth } from '@/contexts/auth.context';
 import { useClass } from '@/hooks/useClass';
-import { useToast } from '@/hooks/useToast';
 import { ClassModel } from '@/types/models/class.model';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { Image } from 'expo-image';
@@ -14,18 +13,12 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 const HomeScreen = () => {
     const { user } = useAuth();
-    const toast = useToast();
 
     const {
         data: classes,
         isPending: isLoadingClasses,
-        error,
         totalCount,
     } = useClass();
-
-    if (error) {
-        toast.errorGeneral();
-    }
 
     let subjectsRowContent;
     if (isLoadingClasses) {

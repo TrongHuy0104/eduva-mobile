@@ -1,4 +1,5 @@
-import { getItem, removeItem, setItem } from '@/utils/storage';
+import { callGlobalLogout } from '@/contexts/auth.context';
+import { getItem, setItem } from '@/utils/storage';
 import axios from 'axios';
 import { router } from 'expo-router';
 
@@ -52,13 +53,8 @@ client.interceptors.response.use(
                 return client(originalRequest);
             } catch (refreshError) {
                 // Clear tokens and redirect to login if refresh fails
-                await removeItem('accessToken');
-                await removeItem('refreshToken');
-                await removeItem('user');
-
-                // You would typically navigate to login here
+                await callGlobalLogout();
                 router.push('/(tabs)/home');
-
                 return Promise.reject(refreshError);
             }
         }

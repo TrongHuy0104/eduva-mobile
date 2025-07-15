@@ -32,6 +32,14 @@ interface AuthProviderProps {
     children: ReactNode;
 }
 
+let globalLogout: (() => Promise<void>) | null = null;
+export const setGlobalLogout = (fn: () => Promise<void>) => {
+    globalLogout = fn;
+};
+export const callGlobalLogout = async () => {
+    if (globalLogout) await globalLogout();
+};
+
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -100,6 +108,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     useEffect(() => {
         loadUser();
     }, [loadUser]);
+
+    // Check for missing user or tokens and logout if any are missing
+    useEffect(() => {
+        if (!isLoading) {
+            const checkAuth = async () => {
+                const userData = await getItem('user');
+                const accessToken = await getItem('accessToken');
+                const refreshToken = await getItem('refreshToken');
+                if (!userData || !accessToken || !refreshToken) {
+                    await logout();
+                }
+            };
+            checkAuth();
+        }
+    }, [isLoading, logout]);
+
+    useEffect(() => {
+        setGlobalLogout(logout);
+    }, [logout]);
 
     const value: AuthContextType = {
         user,
