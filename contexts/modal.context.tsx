@@ -39,89 +39,91 @@ export const ModalProvider = ({ children }: ModalProviderProps) => {
             >
                 {children}
 
-                <Modal visible={isOpen} transparent animationType="fade">
-                    <Pressable
-                        style={styles.modalOverlay}
-                        onPress={() => {
-                            closeModal();
-                        }}
-                    >
+                <View>
+                    <Modal visible={isOpen} transparent animationType="fade">
                         <Pressable
-                            style={styles.modalContent}
-                            onPress={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
+                            style={styles.modalOverlay}
+                            onPress={() => {
+                                closeModal();
+                            }}
                         >
-                            {/* Multiple gradient layers to recreate the CSS effect */}
-                            <LinearGradient
-                                colors={['#0065e0', '#0f8bff']}
-                                start={{ x: 0, y: 0 }}
-                                end={{ x: 1, y: 1 }}
-                                style={styles.background}
-                            />
-                            <LinearGradient
-                                colors={[
-                                    'transparent',
-                                    'transparent',
-                                    '#00e676',
-                                ]}
-                                locations={[0, 0.65, 0.95]}
-                                start={{ x: 0.5, y: 0 }}
-                                end={{ x: 0.5, y: 1 }}
-                                style={styles.background}
-                            />
-                            <LinearGradient
-                                colors={['#ffffff40', '#fff0']}
-                                locations={[0, 0.4]}
-                                start={{ x: 0, y: 1 }}
-                                end={{ x: 1, y: 0 }}
-                                style={styles.background}
-                            />
-                            <LinearGradient
-                                colors={[
-                                    '#fede8a',
-                                    '#f8a6c2',
-                                    '#f8a6c266',
-                                    'transparent',
-                                ]}
-                                locations={[0, 0.3, 0.41, 0.52]}
-                                start={{ x: 1, y: 0.68 }}
-                                end={{ x: 0, y: 0.32 }}
-                                style={styles.background}
-                            />
-                            <LinearGradient
-                                colors={['#b16dff', 'transparent']}
-                                locations={[0, 0.46]}
-                                start={{ x: 1, y: 0.68 }}
-                                end={{ x: 0, y: 0.32 }}
-                                style={styles.background}
-                            />
-
-                            <View style={styles.btnsGroup}>
-                                <Pressable
-                                    onPress={() => {
-                                        closeModal();
-                                    }}
-                                    style={({ pressed }) => [
-                                        styles.closeBtn,
-                                        {
-                                            backgroundColor: pressed
-                                                ? '#0003'
-                                                : '#0000001a',
-                                        },
+                            <Pressable
+                                style={styles.modalContent}
+                                onPress={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
+                            >
+                                {/* Multiple gradient layers to recreate the CSS effect */}
+                                <LinearGradient
+                                    colors={['#0065e0', '#0f8bff']}
+                                    start={{ x: 0, y: 0 }}
+                                    end={{ x: 1, y: 1 }}
+                                    style={styles.background}
+                                />
+                                <LinearGradient
+                                    colors={[
+                                        'transparent',
+                                        'transparent',
+                                        '#00e676',
                                     ]}
-                                >
-                                    <FontAwesome6
-                                        name="xmark"
-                                        solid
-                                        size={20}
-                                        color="#000"
-                                    />
-                                </Pressable>
-                            </View>
-                            {modalContent}
+                                    locations={[0, 0.65, 0.95]}
+                                    start={{ x: 0.5, y: 0 }}
+                                    end={{ x: 0.5, y: 1 }}
+                                    style={styles.background}
+                                />
+                                <LinearGradient
+                                    colors={['#ffffff40', '#fff0']}
+                                    locations={[0, 0.4]}
+                                    start={{ x: 0, y: 1 }}
+                                    end={{ x: 1, y: 0 }}
+                                    style={styles.background}
+                                />
+                                <LinearGradient
+                                    colors={[
+                                        '#fede8a',
+                                        '#f8a6c2',
+                                        '#f8a6c266',
+                                        'transparent',
+                                    ]}
+                                    locations={[0, 0.3, 0.41, 0.52]}
+                                    start={{ x: 1, y: 0.68 }}
+                                    end={{ x: 0, y: 0.32 }}
+                                    style={styles.background}
+                                />
+                                <LinearGradient
+                                    colors={['#b16dff', 'transparent']}
+                                    locations={[0, 0.46]}
+                                    start={{ x: 1, y: 0.68 }}
+                                    end={{ x: 0, y: 0.32 }}
+                                    style={styles.background}
+                                />
+
+                                <View style={styles.btnsGroup}>
+                                    <Pressable
+                                        onPress={() => {
+                                            closeModal();
+                                        }}
+                                        style={({ pressed }) => [
+                                            styles.closeBtn,
+                                            {
+                                                backgroundColor: pressed
+                                                    ? '#0003'
+                                                    : '#0000001a',
+                                            },
+                                        ]}
+                                    >
+                                        <FontAwesome6
+                                            name="xmark"
+                                            solid
+                                            size={20}
+                                            color="#000"
+                                        />
+                                    </Pressable>
+                                </View>
+                                {modalContent}
+                            </Pressable>
+                            <Toast position="top" />
                         </Pressable>
-                        <Toast position="top" />
-                    </Pressable>
-                </Modal>
+                    </Modal>
+                </View>
             </ModalContext.Provider>
         </>
     );

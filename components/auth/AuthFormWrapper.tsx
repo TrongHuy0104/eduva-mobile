@@ -8,12 +8,12 @@ import LoginForm from './LoginForm';
 const AuthFormWrapper = () => {
     const [modalName, setModalName] = useState('login');
     return (
-        <>
+        <View>
             {/* Logo */}
             <View style={styles.logoWrapper}>
                 <Pressable
                     // @ts-ignore
-                    onPress={() => router.push('/(tabs)')}
+                    onPress={() => router.push('/(tabs)/home')}
                     style={{ display: 'flex', borderRadius: 10 }}
                 >
                     <Image
@@ -29,7 +29,7 @@ const AuthFormWrapper = () => {
                 Việc bạn tiếp tục sử dụng trang web này đồng nghĩa bạn đồng ý
                 với điều khoản sử dụng của chúng tôi
             </Text>
-        </>
+        </View>
     );
 };
 

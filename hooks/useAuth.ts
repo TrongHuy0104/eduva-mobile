@@ -9,13 +9,13 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { StatusCode } from '@/constants/status-code.constant';
 import { UserRoles } from '@/constants/user-roles.constant';
-import { useAuth } from '@/contexts/auth.context';
+import { callGlobalLogout, useAuth } from '@/contexts/auth.context';
 import { useModal } from '@/contexts/modal.context';
 import { LoginRequest } from '@/types/requests/login.request';
 import { AuthTokenResponse } from '@/types/responses/auth.response';
 import { BaseResponse } from '@/types/responses/base.response';
 import { router } from 'expo-router';
-import { login, logout } from '../api/auth';
+import { login } from '../api/auth';
 import { useToast } from './useToast';
 import { useUser } from './useUser';
 
@@ -135,22 +135,21 @@ export const useLogout = (): UseMutationResult<
     AxiosError<BaseResponse>,
     void
 > => {
-    const { logout: authLogout } = useAuth();
     const queryClient = useQueryClient();
 
     return useMutation<void, AxiosError<BaseResponse>, void>({
         mutationFn: async () => {
-            await logout();
+            // await logout();
+            await callGlobalLogout();
         },
         onSuccess: () => {
-            authLogout();
             router.push('/(tabs)/home');
             queryClient.clear();
         },
         onError: (error) => {
             console.error('Logout error:', error);
             // Still logout even if server logout fails
-            authLogout();
+            callGlobalLogout();
             queryClient.clear();
         },
     });

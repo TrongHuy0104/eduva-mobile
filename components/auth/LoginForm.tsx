@@ -35,7 +35,7 @@ const LoginForm = () => {
     };
 
     return (
-        <>
+        <View>
             <View style={styles.headingWrapper}>
                 <Text style={styles.heading}>Đăng nhập</Text>
                 <GradientText
@@ -139,7 +139,7 @@ const LoginForm = () => {
                     <Text style={styles.forgotPassword}>Quên mật khẩu?</Text>
                 </Pressable>
             </View>
-        </>
+        </View>
     );
 };
 
