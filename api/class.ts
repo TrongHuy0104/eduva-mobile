@@ -12,3 +12,9 @@ export const getStudentClassesEnrolled = (
 export const getStudentClassById = (classId: string) => {
     return client.get(`/classes/${classId}`);
 };
+
+export const enrollClass = (classCode: string) => {
+    return client.post('/classes/enroll-by-code', {
+        classCode,
+    });
+};

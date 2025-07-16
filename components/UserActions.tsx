@@ -10,36 +10,50 @@ import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 // Available icon libraries you can use:
 import { FontAwesome6 } from '@expo/vector-icons';
 import AuthFormWrapper from './auth/AuthFormWrapper';
+import EnrollClassForm from './home/EnrollClassForm';
 
 const UserActions = () => {
-    const [modalVisible, setModalVisible] = useState(false);
+    const [userDropdownVisible, setUserDropdownVisible] = useState(false);
+
+    const { openModal } = useModal();
+
     const pathname = usePathname();
 
     const isLearnRoute = pathname.startsWith('/learn');
 
     const { user } = useAuth();
-    const { openModal } = useModal();
     const { mutate: logout } = useLogout();
 
     return (
         <>
             {user ? (
                 // Avatar
-                <Pressable onPress={() => setModalVisible(true)}>
-                    <LinearGradient
-                        colors={['#ffd900', '#b45264']}
-                        start={{ x: 0.5, y: 0 }}
-                        end={{ x: 0.5, y: 1 }}
-                        style={styles.avatarWrapper}
+                <>
+                    <Pressable
+                        style={({ pressed }) => [
+                            styles.enrollBtn,
+                            { opacity: pressed ? 0.7 : 1 },
+                        ]}
+                        onPress={() => openModal(<EnrollClassForm />)}
                     >
-                        <Image
-                            style={[styles.avatar]}
-                            source={user.avatarUrl}
-                            contentFit="contain"
-                            transition={1000}
-                        />
-                    </LinearGradient>
-                </Pressable>
+                        <FontAwesome6 name="plus" size={20} color="#fff" />
+                    </Pressable>
+                    <Pressable onPress={() => setUserDropdownVisible(true)}>
+                        <LinearGradient
+                            colors={['#ffd900', '#b45264']}
+                            start={{ x: 0.5, y: 0 }}
+                            end={{ x: 0.5, y: 1 }}
+                            style={styles.avatarWrapper}
+                        >
+                            <Image
+                                style={[styles.avatar]}
+                                source={user.avatarUrl}
+                                contentFit="contain"
+                                transition={1000}
+                            />
+                        </LinearGradient>
+                    </Pressable>
+                </>
             ) : (
                 <Pressable
                     style={({ pressed }) => [
@@ -48,7 +62,7 @@ const UserActions = () => {
                             justifyContent: 'center',
                             alignItems: 'center',
                             height: windowHeight(26),
-                            backgroundColor: '#007bff',
+                            backgroundColor: '#0093fc',
                             borderRadius: 999,
                             paddingHorizontal: 8,
                             paddingVertical: 4,
@@ -72,15 +86,15 @@ const UserActions = () => {
             )}
             {/* Modal */}
             <Modal
-                visible={modalVisible}
+                visible={userDropdownVisible}
                 style={{ maxWidth: '45%' }}
                 transparent
                 animationType="fade"
-                onRequestClose={() => setModalVisible(false)}
+                onRequestClose={() => setUserDropdownVisible(false)}
             >
                 <Pressable
                     style={styles.modalOverlay}
-                    onPress={() => setModalVisible(false)}
+                    onPress={() => setUserDropdownVisible(false)}
                 >
                     <Pressable
                         style={[
@@ -149,7 +163,7 @@ const UserActions = () => {
                             // @ts-ignore
                             onPress={() => {
                                 router.push('/(tabs)/profile');
-                                setModalVisible(false);
+                                setUserDropdownVisible(false);
                             }}
                         >
                             {({ pressed }) => {
@@ -199,7 +213,7 @@ const UserActions = () => {
                         <Pressable
                             style={styles.modalItem}
                             onPress={() => {
-                                setModalVisible(false);
+                                setUserDropdownVisible(false);
                             }}
                         >
                             {({ pressed }) => {
@@ -260,7 +274,7 @@ const UserActions = () => {
                         <Pressable
                             style={styles.modalItem}
                             onPress={() => {
-                                setModalVisible(false);
+                                setUserDropdownVisible(false);
                             }}
                         >
                             {({ pressed }) => {
@@ -322,7 +336,7 @@ const UserActions = () => {
                             onPress={() => {
                                 // @ts-ignore
                                 router.push('/(routes)/settings');
-                                setModalVisible(false);
+                                setUserDropdownVisible(false);
                             }}
                         >
                             {({ pressed }) => {
@@ -370,7 +384,7 @@ const UserActions = () => {
                         <Pressable
                             style={styles.modalItem}
                             onPress={() => {
-                                setModalVisible(false);
+                                setUserDropdownVisible(false);
                                 logout();
                             }}
                         >
@@ -488,5 +502,13 @@ const styles = StyleSheet.create({
     modalItemText: {
         fontSize: 14,
         color: '#666',
+    },
+    enrollBtn: {
+        width: windowWidth(46),
+        height: windowWidth(46),
+        borderRadius: 9999,
+        backgroundColor: '#0093fc',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
 });

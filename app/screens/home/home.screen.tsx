@@ -1,5 +1,5 @@
-import BannerCarousel from '@/components/BannerCarousel';
 import SubjectCard from '@/components/ClassCard';
+import BannerCarousel from '@/components/home/BannerCarousel';
 import SubjectCardSkeleton from '@/components/skeleton/ClassCardSkeleton';
 import { windowHeight } from '@/constants/app.constants';
 import { useAuth } from '@/contexts/auth.context';
