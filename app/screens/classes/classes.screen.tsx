@@ -58,15 +58,25 @@ const ClassesScreen = () => {
         }
     };
 
-    const renderSkeleton = () => (
-        <View style={styles.classesRow}>
-            {Array.from({ length: 6 }).map((_, idx) => (
-                <View style={styles.classItem} key={`class-${idx}`}>
-                    <ClassCardSkeleton />
-                </View>
-            ))}
-        </View>
-    );
+    const renderSkeleton = () => {
+        const skeletons = [
+            { id: 'skeleton-1' },
+            { id: 'skeleton-2' },
+            { id: 'skeleton-3' },
+            { id: 'skeleton-4' },
+            { id: 'skeleton-5' },
+            { id: 'skeleton-6' },
+        ];
+        return (
+            <View style={styles.classesRow}>
+                {skeletons.map((skeleton) => (
+                    <View style={styles.classItem} key={skeleton.id}>
+                        <ClassCardSkeleton />
+                    </View>
+                ))}
+            </View>
+        );
+    };
 
     return (
         <View style={styles.container}>

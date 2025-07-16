@@ -71,7 +71,7 @@ const UpdateAvatar = ({
                 selectedAsset.uri,
                 user.id
             );
-            if (error || !url) throw new Error(error || 'Upload failed');
+            if (error || !url) throw new Error(error ?? 'Upload failed');
 
             // 2. Update avatar URL in your database
             updateProfile(

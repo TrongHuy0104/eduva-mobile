@@ -19,10 +19,10 @@ const { height: windowHeight } = Dimensions.get('window');
 export default function UpdatePhoneForm({
     defaultValue,
     setDialogName,
-}: {
+}: Readonly<{
     defaultValue: string;
     setDialogName: (name: string) => void;
-}) {
+}>) {
     const { mutate: updateProfile, isPending } = useUpdateProfile();
 
     const { updateCurrentUser, user } = useAuth();
@@ -72,7 +72,7 @@ export default function UpdatePhoneForm({
                     rules={{
                         required: 'Trường này không được để trống',
                         pattern: {
-                            value: /^(0|\+84)(3[2-9]|5[689]|7[06-9]|8[1-5]|9[0-9])[0-9]{7}$/,
+                            value: /^(0|\+84)(3[2-9]|5[689]|7[06-9]|8[1-5]|9\d)\d{7}$/,
                             message: 'Số điện thoại không hợp lệ',
                         },
                     }}

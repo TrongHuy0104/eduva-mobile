@@ -57,11 +57,14 @@ const Activity = () => {
             </View>
             <View style={styles.subjectsRow}>
                 {isLoadingClasses
-                    ? Array.from({ length: 6 }).map((_, idx) => (
-                          <View style={styles.subjectCol} key={idx}>
-                              <SubjectCardSkeleton />
-                          </View>
-                      ))
+                    ? Array.from({ length: 6 }).map(() => {
+                          const key = crypto.randomUUID();
+                          return (
+                              <View style={styles.subjectCol} key={key}>
+                                  <SubjectCardSkeleton />
+                              </View>
+                          );
+                      })
                     : classes?.map((classItem: ClassModel, idx: number) => (
                           <View
                               style={styles.subjectCol}

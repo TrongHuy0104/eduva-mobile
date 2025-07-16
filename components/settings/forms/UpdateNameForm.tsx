@@ -19,10 +19,10 @@ const { height: windowHeight } = Dimensions.get('window');
 export default function UpdateNameForm({
     defaultValue,
     setDialogName,
-}: {
+}: Readonly<{
     defaultValue: string;
     setDialogName: (name: string) => void;
-}) {
+}>) {
     const { mutate: updateProfile, isPending } = useUpdateProfile();
     const { updateCurrentUser, user } = useAuth();
     const {

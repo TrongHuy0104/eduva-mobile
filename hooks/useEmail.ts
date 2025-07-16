@@ -15,7 +15,6 @@ export const useResendVerificationEmail = (): UseMutationResult<
     return useMutation<void, AxiosError<BaseResponse>, EmailLinkRequest>({
         mutationFn: async (req: EmailLinkRequest) => {
             await resendConfirmEmail(req);
-            return;
         },
         onSuccess: () => {
             toast.success(
@@ -26,7 +25,7 @@ export const useResendVerificationEmail = (): UseMutationResult<
         onError: (err) => {
             console.log(err);
 
-            // toast.errorGeneral();
+            toast.errorGeneral();
         },
     });
 };

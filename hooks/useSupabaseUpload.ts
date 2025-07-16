@@ -41,9 +41,9 @@ export function useSupabaseUpload() {
             setUploading(false);
             return { url: publicUrlData.publicUrl, error: null };
         } catch (err: any) {
-            setError(err.message || 'Upload failed');
+            setError(err.message ?? 'Upload failed');
             setUploading(false);
-            return { url: null, error: err.message || 'Upload failed' };
+            return { url: null, error: err.message ?? 'Upload failed' };
         }
     };
 

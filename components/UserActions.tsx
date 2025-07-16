@@ -12,6 +12,28 @@ import { FontAwesome6 } from '@expo/vector-icons';
 import AuthFormWrapper from './auth/AuthFormWrapper';
 import EnrollClassForm from './home/EnrollClassForm';
 
+const iconColorMap = {
+    profile: { default: '#666', pressed: '#292929' },
+    notification: { default: '#666', pressed: '#292929' },
+    class: { default: '#666', pressed: '#292929' },
+    settings: { default: '#666', pressed: '#292929' },
+    logout: { default: '#c0392b', pressed: '#e74c3c' },
+};
+
+const getIconColor = (
+    action: keyof typeof iconColorMap,
+    pressed: boolean,
+    isLearnRoute: boolean
+) => {
+    if (action === 'logout') {
+        return pressed ? '#e74c3c' : '#c0392b';
+    }
+    if (pressed) {
+        return isLearnRoute ? '#fff' : iconColorMap[action].pressed;
+    }
+    return isLearnRoute ? '#fffc' : iconColorMap[action].default;
+};
+
 const UserActions = () => {
     const [userDropdownVisible, setUserDropdownVisible] = useState(false);
 
@@ -167,22 +189,17 @@ const UserActions = () => {
                             }}
                         >
                             {({ pressed }) => {
-                                const getIconColor = (pressed: boolean) => {
-                                    if (pressed) {
-                                        return isLearnRoute
-                                            ? '#fff'
-                                            : '#292929';
-                                    } else {
-                                        return isLearnRoute ? '#fffc' : '#666';
-                                    }
-                                };
                                 return (
                                     <View style={styles.modalItemContent}>
                                         <FontAwesome6
                                             name="user"
                                             solid
                                             size={16}
-                                            color={getIconColor(pressed)}
+                                            color={getIconColor(
+                                                'profile',
+                                                pressed,
+                                                isLearnRoute
+                                            )}
                                             style={styles.modalItemIcon}
                                         />
                                         <Text
@@ -217,22 +234,17 @@ const UserActions = () => {
                             }}
                         >
                             {({ pressed }) => {
-                                const getIconColor = (pressed: boolean) => {
-                                    if (pressed) {
-                                        return isLearnRoute
-                                            ? '#fff'
-                                            : '#292929';
-                                    } else {
-                                        return isLearnRoute ? '#fffc' : '#666';
-                                    }
-                                };
                                 return (
                                     <View style={styles.modalItemContent}>
                                         <FontAwesome6
                                             name="bell"
                                             solid
                                             size={16}
-                                            color={getIconColor(pressed)}
+                                            color={getIconColor(
+                                                'notification',
+                                                pressed,
+                                                isLearnRoute
+                                            )}
                                             style={styles.modalItemIcon}
                                         />
                                         <Text
@@ -279,21 +291,16 @@ const UserActions = () => {
                             }}
                         >
                             {({ pressed }) => {
-                                const getIconColor = (pressed: boolean) => {
-                                    if (pressed) {
-                                        return isLearnRoute
-                                            ? '#fff'
-                                            : '#292929';
-                                    } else {
-                                        return isLearnRoute ? '#fffc' : '#666';
-                                    }
-                                };
                                 return (
                                     <View style={styles.modalItemContent}>
                                         <FontAwesome6
                                             name="graduation-cap"
                                             size={16}
-                                            color={getIconColor(pressed)}
+                                            color={getIconColor(
+                                                'class',
+                                                pressed,
+                                                isLearnRoute
+                                            )}
                                             style={styles.modalItemIcon}
                                         />
                                         <Text
@@ -341,21 +348,16 @@ const UserActions = () => {
                             }}
                         >
                             {({ pressed }) => {
-                                const getIconColor = (pressed: boolean) => {
-                                    if (pressed) {
-                                        return isLearnRoute
-                                            ? '#fff'
-                                            : '#292929';
-                                    } else {
-                                        return isLearnRoute ? '#fffc' : '#666';
-                                    }
-                                };
                                 return (
                                     <View style={styles.modalItemContent}>
                                         <FontAwesome6
                                             name="gear"
                                             size={16}
-                                            color={getIconColor(pressed)}
+                                            color={getIconColor(
+                                                'settings',
+                                                pressed,
+                                                isLearnRoute
+                                            )}
                                             style={styles.modalItemIcon}
                                         />
                                         <Text
@@ -390,21 +392,16 @@ const UserActions = () => {
                             }}
                         >
                             {({ pressed }) => {
-                                const getIconColor = (pressed: boolean) => {
-                                    if (pressed) {
-                                        return isLearnRoute
-                                            ? '#fff'
-                                            : '#292929';
-                                    } else {
-                                        return isLearnRoute ? '#fffc' : '#666';
-                                    }
-                                };
                                 return (
                                     <View style={styles.modalItemContent}>
                                         <FontAwesome6
                                             name="arrow-right-from-bracket"
                                             size={16}
-                                            color={getIconColor(pressed)}
+                                            color={getIconColor(
+                                                'logout',
+                                                pressed,
+                                                isLearnRoute
+                                            )}
                                             style={styles.modalItemIcon}
                                         />
                                         <Text

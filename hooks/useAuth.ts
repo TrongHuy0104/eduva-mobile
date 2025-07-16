@@ -148,7 +148,6 @@ export const useLogout = (): UseMutationResult<
 
     return useMutation<void, AxiosError<BaseResponse>, void>({
         mutationFn: async () => {
-            // await logout();
             await callGlobalLogout();
         },
         onSuccess: () => {
