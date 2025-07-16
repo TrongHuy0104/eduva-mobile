@@ -274,6 +274,7 @@ const UserActions = () => {
                         <Pressable
                             style={styles.modalItem}
                             onPress={() => {
+                                router.push('/(tabs)/home/classes');
                                 setUserDropdownVisible(false);
                             }}
                         >
@@ -335,7 +336,7 @@ const UserActions = () => {
                             style={styles.modalItem}
                             onPress={() => {
                                 // @ts-ignore
-                                router.push('/(routes)/settings');
+                                router.push('/(routes)/settings/personal');
                                 setUserDropdownVisible(false);
                             }}
                         >

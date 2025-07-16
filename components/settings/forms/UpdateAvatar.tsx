@@ -1,3 +1,6 @@
+import { useAuth } from '@/contexts/auth.context';
+import { useSupabaseUpload } from '@/hooks/useSupabaseUpload';
+import { useUpdateProfile } from '@/hooks/useUser';
 import * as ImagePicker from 'expo-image-picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
@@ -11,13 +14,21 @@ import {
     View,
 } from 'react-native';
 
-const DEFAULT_AVATAR = 'https://i.imgur.com/1Q9Z1Zm.png';
-
-const UpdateAvatar = () => {
-    const [avatar, setAvatar] = useState<string>(DEFAULT_AVATAR);
+const UpdateAvatar = ({
+    defaultValue,
+    setDialogName,
+}: {
+    defaultValue: string;
+    setDialogName: (name: string) => void;
+}) => {
+    const [avatar, setAvatar] = useState<string>(defaultValue);
     const [localAvatar, setLocalAvatar] = useState<string | null>(null);
     const [selectedAsset, setSelectedAsset] = useState<any>(null);
     const [uploading, setUploading] = useState(false);
+
+    const { uploadImage } = useSupabaseUpload();
+    const { mutate: updateProfile, isPending } = useUpdateProfile();
+    const { user, updateCurrentUser } = useAuth();
 
     const pickImage = async () => {
         try {
@@ -51,35 +62,44 @@ const UpdateAvatar = () => {
     };
 
     const uploadAvatar = async () => {
-        if (!selectedAsset) return;
+        if (!selectedAsset || !user?.id) return;
 
         setUploading(true);
         try {
-            const formData = new FormData();
-            formData.append('avatar', {
-                uri: selectedAsset.uri,
-                type: selectedAsset.type ?? 'image/jpeg',
-                name: selectedAsset.fileName ?? 'avatar.jpg',
-            } as any);
+            // 1. Upload to Supabase Storage
+            const { url, error } = await uploadImage(
+                selectedAsset.uri,
+                user.id
+            );
+            if (error || !url) throw new Error(error || 'Upload failed');
 
-            const res = await fetch('https://your-api.com/api/upload-avatar', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-                body: formData,
-            });
-
-            if (!res.ok) throw new Error('Upload failed');
-            const data = await res.json();
-            setAvatar(data.avatarUrl);
-            setLocalAvatar(null);
-            setSelectedAsset(null); // Reset selected asset
-            Alert.alert('Thành công', 'Cập nhật ảnh đại diện thành công!');
+            // 2. Update avatar URL in your database
+            updateProfile(
+                { avatarUrl: url },
+                {
+                    onSuccess: () => {
+                        setAvatar(url);
+                        setLocalAvatar(null);
+                        setSelectedAsset(null);
+                        updateCurrentUser({ ...user, avatarUrl: url });
+                        Alert.alert(
+                            'Thành công',
+                            'Cập nhật ảnh đại diện thành công!'
+                        );
+                        setDialogName('');
+                    },
+                    onError: () => {
+                        Alert.alert('Lỗi', 'Không thể cập nhật ảnh đại diện');
+                    },
+                    onSettled: () => {
+                        setUploading(false);
+                    },
+                }
+            );
         } catch (err) {
-            Alert.alert('Lỗi', 'Không thể tải ảnh lên server');
-        } finally {
+            console.log('err', err);
             setUploading(false);
+            Alert.alert('Lỗi', 'Không thể tải ảnh lên server');
         }
     };
 
@@ -100,7 +120,7 @@ const UpdateAvatar = () => {
             <TouchableOpacity
                 style={styles.uploadBtn}
                 onPress={pickImage}
-                disabled={uploading}
+                disabled={uploading || isPending}
             >
                 <Text style={styles.uploadBtnText}>+ Chọn ảnh mới</Text>
             </TouchableOpacity>
@@ -112,11 +132,14 @@ const UpdateAvatar = () => {
                 style={{ opacity: !selectedAsset || uploading ? 0.5 : 1 }}
             >
                 <LinearGradient
-                    colors={['#2cccff', '#22dfbf']}
+                    colors={['#2093e7', '#22cfd2']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
                     style={styles.saveButton}
                 >
+                    {isPending && (
+                        <ActivityIndicator color="white" size="small" />
+                    )}
                     <Text style={styles.saveButtonText}>
                         {uploading ? 'Đang lưu...' : 'Lưu lại'}
                     </Text>
@@ -141,6 +164,8 @@ const styles = StyleSheet.create({
         borderRadius: 9999,
         alignItems: 'center',
         justifyContent: 'center',
+        flexDirection: 'row',
+        gap: 6,
     },
     saveButtonText: {
         color: 'white',

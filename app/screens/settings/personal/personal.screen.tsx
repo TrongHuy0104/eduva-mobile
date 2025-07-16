@@ -1,16 +1,18 @@
 import Dialog from '@/components/settings/Dialog';
 import ProfileCard from '@/components/settings/ProfileCard';
 import UpdateAvatar from '@/components/settings/forms/UpdateAvatar';
-import UpdateBioForm from '@/components/settings/forms/UpdateBioForm';
-import UpdateEmailForm from '@/components/settings/forms/UpdateEmailForm';
+import UpdateNameForm from '@/components/settings/forms/UpdateNameForm';
 import UpdatePhoneForm from '@/components/settings/forms/UpdatePhoneForm';
-import UpdateSocialForm from '@/components/settings/forms/UpdateSocialForm';
+import { useAuth } from '@/contexts/auth.context';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 
 const PersonalScreen = () => {
+    const { user } = useAuth();
+
     const [dialogName, setDialogName] = useState('');
     return (
         <ScrollView showsVerticalScrollIndicator={false}>
@@ -43,32 +45,22 @@ const PersonalScreen = () => {
                 <View style={{ gap: 4 }}>
                     <Text style={styles.infoHeading}>Thông tin cơ bản</Text>
                     <Text style={styles.infoSubHeading}>
-                        Quản lý tên hiển thị, tên người dùng, bio và avatar của
-                        bạn.
+                        Quản lý tên hiển thị, tên người dùng và avatar của bạn.
                     </Text>
                 </View>
 
                 <View style={styles.itemsContainer}>
                     <ProfileCard
                         title="Họ và tên"
-                        subtitle="Trọng Huy"
-                        readonly
-                    />
-                    <ProfileCard
-                        title="Tên người dùng"
-                        subtitle="@huytrong"
-                        readonly
-                    />
-                    <ProfileCard
-                        title="Giới thiệu"
-                        dialogName={'bio'}
+                        subtitle={user?.fullName}
+                        dialogName={'fullname'}
                         setDialogName={setDialogName}
                     />
                     <ProfileCard
                         dialogName={'avatar'}
                         setDialogName={setDialogName}
                         title="Ảnh đại diện"
-                        avatarUrl="https://accounts.fullstack.edu.vn/assets/logo-lV2rGpF0.png"
+                        avatarUrl={user?.avatarUrl}
                     />
                 </View>
             </View>
@@ -85,56 +77,32 @@ const PersonalScreen = () => {
                 <View style={styles.itemsContainer}>
                     <ProfileCard
                         title="Email"
+                        subtitle={user?.email}
                         dialogName={'email'}
                         setDialogName={setDialogName}
+                        readonly
                     />
                     <ProfileCard
                         title="Số điện thoại"
-                        subtitle="0123456789"
+                        subtitle={user?.phoneNumber}
                         dialogName={'phone'}
                         setDialogName={setDialogName}
                     />
                 </View>
             </View>
-
-            {/* Socials Information */}
-            <View style={[styles.infoContainer, { marginTop: 40 }]}>
-                <View style={{ gap: 4 }}>
-                    <Text style={styles.infoHeading}>
-                        Thông tin mạng xã hội
-                    </Text>
-                    <Text style={styles.infoSubHeading}>
-                        Quản lý liên kết tới các trang mạng xã hội của bạn.
-                    </Text>
-                </View>
-
-                <View style={styles.itemsContainer}>
-                    <ProfileCard
-                        title="Facebook"
-                        dialogName={'facebook'}
-                        setDialogName={setDialogName}
-                    />
-                    <ProfileCard
-                        title="Instagram"
-                        dialogName={'instagram'}
-                        setDialogName={setDialogName}
-                    />
-                    <ProfileCard
-                        title="Tiktok"
-                        dialogName={'tiktok'}
-                        setDialogName={setDialogName}
-                    />
-                </View>
-            </View>
+            <Toast />
 
             {/* Dialogs List */}
-            {dialogName === 'bio' && (
+            {dialogName === 'fullname' && (
                 <Dialog
                     setDialogName={setDialogName}
-                    title="Chỉnh sửa phần giới thiệu"
-                    desc="Phần giới thiệu (tiểu sử) được hiển thị tại trang cá nhân của bạn, giúp mọi người hiểu rõ hơn về bạn."
+                    title="Cập nhật tên của bạn"
+                    desc="Tên sẽ được hiển thị trên trang cá nhân, trong các bình luận và bài viết của bạn."
                 >
-                    <UpdateBioForm />
+                    <UpdateNameForm
+                        defaultValue={user?.fullName ?? ''}
+                        setDialogName={setDialogName}
+                    />
                 </Dialog>
             )}
             {dialogName === 'avatar' && (
@@ -144,16 +112,10 @@ const PersonalScreen = () => {
                     desc="Ảnh đại diện giúp mọi người nhận biết bạn dễ dàng hơn qua các
                 bài viết, bình luận, tin nhắn..."
                 >
-                    <UpdateAvatar />
-                </Dialog>
-            )}
-            {dialogName === 'email' && (
-                <Dialog
-                    setDialogName={setDialogName}
-                    title="Địa chỉ email"
-                    desc="Cung cấp địa chỉ email là điều cần thiết để làm việc với hệ thống."
-                >
-                    <UpdateEmailForm />
+                    <UpdateAvatar
+                        defaultValue={user?.avatarUrl ?? ''}
+                        setDialogName={setDialogName}
+                    />
                 </Dialog>
             )}
             {dialogName === 'phone' && (
@@ -162,45 +124,9 @@ const PersonalScreen = () => {
                     title="Số điện thoại"
                     desc="Số điện thoại của bạn được dùng để liên hệ."
                 >
-                    <UpdatePhoneForm />
-                </Dialog>
-            )}
-            {dialogName === 'facebook' && (
-                <Dialog
-                    setDialogName={setDialogName}
-                    title="Facebook"
-                    desc="Địa chỉ Facebook sẽ được hiển thị trên trang cá nhân của bạn. Ví dụ: https://facebook.com/username."
-                >
-                    <UpdateSocialForm
-                        name="facebook"
-                        label="Facebook"
-                        placeholder="Nhập đường dẫn trang cá nhân"
-                    />
-                </Dialog>
-            )}
-            {dialogName === 'instagram' && (
-                <Dialog
-                    setDialogName={setDialogName}
-                    title="Instagram"
-                    desc="Địa chỉ instagram sẽ được hiển thị trên trang cá nhân của bạn. Ví dụ: https://instagram.com/username."
-                >
-                    <UpdateSocialForm
-                        name="instagram"
-                        label="Instagram"
-                        placeholder="Nhập đường dẫn instagram"
-                    />
-                </Dialog>
-            )}
-            {dialogName === 'tiktok' && (
-                <Dialog
-                    setDialogName={setDialogName}
-                    title="Tiktok"
-                    desc="Địa chỉ tiktok sẽ được hiển thị trên trang cá nhân của bạn. Ví dụ: https://tiktok.com/username."
-                >
-                    <UpdateSocialForm
-                        name="tiktok"
-                        label="Tiktok"
-                        placeholder="Nhập đường dẫn tiktok"
+                    <UpdatePhoneForm
+                        defaultValue={user?.phoneNumber ?? ''}
+                        setDialogName={setDialogName}
                     />
                 </Dialog>
             )}

@@ -21,7 +21,7 @@ const show = (
         type,
         text1: title,
         text2: message,
-        visibilityTime: options?.visibilityTime ?? 3000,
+        visibilityTime: options?.visibilityTime ?? 4000,
         autoHide: options?.autoHide ?? true,
         topOffset: options?.topOffset ?? 20,
         bottomOffset: options?.bottomOffset,

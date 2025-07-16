@@ -38,7 +38,7 @@ const Activity = () => {
                             style={{
                                 color: '#2093e7',
                                 fontWeight: '500',
-                                fontSize: 17,
+                                fontSize: 15,
                                 marginRight: 4,
                             }}
                         >
@@ -48,7 +48,7 @@ const Activity = () => {
                             <FontAwesome6
                                 name="chevron-right"
                                 solid
-                                size={17}
+                                size={15}
                                 color="#2093e7"
                             />
                         </View>
