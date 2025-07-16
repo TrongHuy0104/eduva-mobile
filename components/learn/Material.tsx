@@ -25,7 +25,7 @@ const Material = ({
     isActive,
 }: MaterialProps) => {
     const { setLastLesson } = useLastMaterialTracking();
-    const { id: materialId } = useLocalSearchParams();
+    const { id: materialId, folderId } = useLocalSearchParams();
 
     const getIcon = () => {
         if (material.contentType === ContentType.DOCX) {
@@ -57,6 +57,9 @@ const Material = ({
         );
     };
 
+    const isCurrentMaterial =
+        material.id === materialId && folder.id === folderId;
+
     return (
         <Pressable
             onPress={redirect}
@@ -64,8 +67,7 @@ const Material = ({
                 styles.material,
                 { backgroundColor: pressed ? '#32353b' : '#272a31' },
                 {
-                    backgroundColor:
-                        materialId === material.id ? '#181d1e' : '#272a31',
+                    backgroundColor: isCurrentMaterial ? '#181d1e' : '#272a31',
                 },
             ]}
         >
@@ -74,7 +76,7 @@ const Material = ({
                     name={getIcon()}
                     solid
                     size={16}
-                    color={materialId === material.id ? '#0f8bff' : '#808b9a'}
+                    color={isCurrentMaterial ? '#0f8bff' : '#808b9a'}
                 />
             </View>
             <View style={{ marginLeft: 10 }}>

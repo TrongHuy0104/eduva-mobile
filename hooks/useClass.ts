@@ -1,13 +1,25 @@
-import { getStudentClassById, getStudentClassesEnrolled } from '@/api/class';
+import {
+    enrollClass,
+    getStudentClassById,
+    getStudentClassesEnrolled,
+} from '@/api/class';
 import { PAGE_SIZE } from '@/constants/app.constants';
+import { StatusCode } from '@/constants/status-code.constant';
 import { useAuth } from '@/contexts/auth.context';
 import { EntityStatus } from '@/types/enums/entity-status.enum';
 import { ClassModel } from '@/types/models/class.model';
 import { GetStudentClassesEnrolledRequest } from '@/types/requests/get-student-classes-enrolled.request';
 import { BaseResponse } from '@/types/responses/base.response';
 import { EntityListResponse } from '@/types/responses/entity-list-response.model';
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { AxiosResponse } from 'axios';
+import {
+    useInfiniteQuery,
+    useMutation,
+    UseMutationResult,
+    useQuery,
+    useQueryClient,
+} from '@tanstack/react-query';
+import { AxiosError, AxiosResponse } from 'axios';
+import { useToast } from './useToast';
 
 interface UseClassParams {
     pageIndex?: number;
@@ -125,4 +137,65 @@ export const useStudentClassById = (classId: string) => {
         error,
         refetch,
     };
+};
+
+export const useEnrollClass = (): UseMutationResult<
+    AxiosResponse<BaseResponse<ClassModel>>,
+    AxiosError<BaseResponse>,
+    string
+> => {
+    const queryClient = useQueryClient();
+    const toast = useToast();
+
+    return useMutation<
+        AxiosResponse<BaseResponse<ClassModel>>,
+        AxiosError<BaseResponse>,
+        string
+    >({
+        mutationFn: (classCode: string) => enrollClass(classCode),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['classes'] });
+        },
+        onError: (res) => {
+            const statusCode = res.response?.data.statusCode;
+
+            queryClient.removeQueries({ queryKey: ['classes'] });
+
+            switch (statusCode) {
+                case StatusCode.CLASS_NOT_FOUND:
+                    toast.error(
+                        'Tham gia lớp học thất bại',
+                        'Mã lớp không tồn tại.'
+                    );
+                    break;
+                case StatusCode.CLASS_CODE_DUPLICATE:
+                    toast.error(
+                        'Tham gia lớp học thất bại',
+                        'Mã lớp đã tồn tại trong hệ thống.'
+                    );
+                    break;
+                case StatusCode.STUDENT_CANNOT_ENROLL_DIFFERENT_SCHOOL:
+                    toast.error(
+                        'Tham gia lớp học thất bại',
+                        'Bạn không thể tham gia lớp học khác trường.'
+                    );
+                    break;
+                case StatusCode.STUDENT_ALREADY_ENROLLED:
+                    toast.error(
+                        'Tham gia lớp học thất bại',
+                        'Bạn đã tham gia lớp học này.'
+                    );
+                    break;
+                case StatusCode.CLASS_NOT_ACTIVE:
+                    toast.error(
+                        'Tham gia lớp học thất bại',
+                        'Lớp học hiện chưa được kích hoạt'
+                    );
+                    break;
+
+                default:
+                    toast.errorGeneral();
+            }
+        },
+    });
 };
