@@ -1,7 +1,11 @@
+import { useAuth } from '@/contexts/auth.context';
+import { useUpdateProfile } from '@/hooks/useUser';
+import { User } from '@/types/models/user.model';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import {
+    ActivityIndicator,
     Dimensions,
     Keyboard,
     StyleSheet,
@@ -12,7 +16,17 @@ import {
 import InputField from '../../InputField';
 
 const { height: windowHeight } = Dimensions.get('window');
-export default function UpdatePhoneForm() {
+export default function UpdatePhoneForm({
+    defaultValue,
+    setDialogName,
+}: Readonly<{
+    defaultValue: string;
+    setDialogName: (name: string) => void;
+}>) {
+    const { mutate: updateProfile, isPending } = useUpdateProfile();
+
+    const { updateCurrentUser, user } = useAuth();
+
     const {
         control,
         handleSubmit,
@@ -23,10 +37,23 @@ export default function UpdatePhoneForm() {
         reValidateMode: 'onChange',
     });
 
-    const inputValue = watch('phone');
+    const inputValue = watch('phoneNumber');
 
     const onSubmit = async (data: any) => {
-        console.log('Form data:', data);
+        updateProfile(
+            {
+                phoneNumber: data.phoneNumber,
+            },
+            {
+                onSuccess() {
+                    setDialogName('');
+                    updateCurrentUser({
+                        ...user,
+                        phoneNumber: data.phoneNumber,
+                    } as User);
+                },
+            }
+        );
     };
 
     const onError = (errors: any) => {
@@ -38,18 +65,19 @@ export default function UpdatePhoneForm() {
             <View style={{ width: '100%', marginTop: 10, overflow: 'hidden' }}>
                 <InputField
                     control={control}
+                    defaultValue={defaultValue}
                     keyboardType="phone-pad"
-                    name="phone"
+                    name="phoneNumber"
                     label="Số điện thoại"
                     rules={{
                         required: 'Trường này không được để trống',
                         pattern: {
-                            value: /^(0|\+84)(3[2-9]|5[6|8|9]|7[0|6-9]|8[1-5]|9[0-9])[0-9]{7}$/,
+                            value: /^(0|\+84)(3[2-9]|5[689]|7[06-9]|8[1-5]|9\d)\d{7}$/,
                             message: 'Số điện thoại không hợp lệ',
                         },
                     }}
                     placeholder="Nhập số điện thoại của bạn"
-                    error={errors.phone}
+                    error={errors.phoneNumber}
                     isSubmitted={isSubmitted}
                 />
             </View>
@@ -61,11 +89,14 @@ export default function UpdatePhoneForm() {
                     Keyboard.dismiss();
                     handleSubmit(onSubmit, onError)();
                 }}
-                disabled={!inputValue}
-                style={{ opacity: !inputValue ? 0.5 : 1 }}
+                disabled={!inputValue || inputValue === defaultValue}
+                style={{
+                    opacity:
+                        !inputValue || inputValue === defaultValue ? 0.7 : 1,
+                }}
             >
                 <LinearGradient
-                    colors={['#2cccff', '#22dfbf']}
+                    colors={['#2093e7', '#22cfd2']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
                     style={{
@@ -75,8 +106,13 @@ export default function UpdatePhoneForm() {
                         borderRadius: 9999,
                         alignItems: 'center',
                         justifyContent: 'center',
+                        flexDirection: 'row',
+                        gap: 6,
                     }}
                 >
+                    {isPending && (
+                        <ActivityIndicator color="white" size="small" />
+                    )}
                     <Text
                         style={{
                             color: 'white',

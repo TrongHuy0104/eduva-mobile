@@ -3,6 +3,7 @@ import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 
 const SettingsScreen = () => {
     return (
@@ -15,13 +16,14 @@ const SettingsScreen = () => {
                     >
                         <Image
                             style={styles.logo}
-                            source="https://fullstack.edu.vn/assets/f8-icon-lV2rGpF0.png"
+                            source={require('../../../assets/images/logo.png')}
                             contentFit="contain"
                             transition={1000}
                         />
                     </Pressable>
                 </View>
                 <Pressable
+                    onPress={() => router.back()}
                     style={({ pressed }) => [
                         styles.closeBtn,
                         {
@@ -89,6 +91,7 @@ const SettingsScreen = () => {
                         style={styles.chevron}
                     />
                 </Pressable>
+                <Toast />
             </View>
         </View>
     );

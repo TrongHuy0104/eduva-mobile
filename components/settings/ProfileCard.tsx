@@ -24,7 +24,10 @@ const ProfileCard = ({
     return (
         <Pressable
             onPress={() =>
-                setDialogName && dialogName && setDialogName(dialogName)
+                !readonly &&
+                setDialogName &&
+                dialogName &&
+                setDialogName(dialogName)
             }
             style={({ pressed }) => [
                 styles.container,

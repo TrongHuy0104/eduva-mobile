@@ -1,8 +1,10 @@
 import SubjectCard from '@/components/ClassCard';
 import BannerCarousel from '@/components/home/BannerCarousel';
+import EnrollClassForm from '@/components/home/EnrollClassForm';
 import SubjectCardSkeleton from '@/components/skeleton/ClassCardSkeleton';
 import { windowHeight } from '@/constants/app.constants';
 import { useAuth } from '@/contexts/auth.context';
+import { useModal } from '@/contexts/modal.context';
 import { useClass } from '@/hooks/useClass';
 import { ClassModel } from '@/types/models/class.model';
 import { FontAwesome6 } from '@expo/vector-icons';
@@ -13,6 +15,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 const HomeScreen = () => {
     const { user } = useAuth();
+    const { openModal } = useModal();
 
     const {
         data: classes,
@@ -71,7 +74,7 @@ const HomeScreen = () => {
                         },
                         { opacity: pressed ? 0.7 : 1 },
                     ]}
-                    onPress={() => {}}
+                    onPress={() => openModal(<EnrollClassForm />)}
                 >
                     <View
                         style={{

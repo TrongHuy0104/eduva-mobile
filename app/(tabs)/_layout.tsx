@@ -9,26 +9,6 @@ import { Pressable, StatusBar, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { moderateScale } from 'react-native-size-matters';
 
-const Layout = () => {
-    const { user } = useAuth();
-    return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
-            <StatusBar barStyle="light-content" backgroundColor="#000" />
-            <Header />
-
-            <Tabs
-                screenOptions={{ headerShown: false }}
-                tabBar={(props) => <CustomTabBar {...props} user={user} />}
-            >
-                <Tabs.Screen name="home" />
-                <Tabs.Screen name="profile/index" />
-            </Tabs>
-        </SafeAreaView>
-    );
-};
-
-export default Layout;
-
 const CustomTabBar = ({ state, user }: any) => {
     return (
         <View
@@ -116,3 +96,23 @@ const CustomTabBar = ({ state, user }: any) => {
         </View>
     );
 };
+
+const Layout = () => {
+    const { user } = useAuth();
+    return (
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
+            <StatusBar barStyle="light-content" backgroundColor="#000" />
+            <Header />
+
+            <Tabs
+                screenOptions={{ headerShown: false }}
+                tabBar={(props) => <CustomTabBar {...props} user={user} />}
+            >
+                <Tabs.Screen name="home" />
+                <Tabs.Screen name="profile/index" />
+            </Tabs>
+        </SafeAreaView>
+    );
+};
+
+export default Layout;

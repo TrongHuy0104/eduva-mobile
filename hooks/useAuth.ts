@@ -16,6 +16,7 @@ import { AuthTokenResponse } from '@/types/responses/auth.response';
 import { BaseResponse } from '@/types/responses/base.response';
 import { router } from 'expo-router';
 import { login } from '../api/auth';
+import { useResendVerificationEmail } from './useEmail';
 import { useToast } from './useToast';
 import { useUser } from './useUser';
 
@@ -31,8 +32,11 @@ export const useLogin = (): UseMutationResult<
     } = useAuth();
     const { data: userProfile } = useUser();
     const { closeModal } = useModal();
+    const { mutate: resendVerificationEmail } = useResendVerificationEmail();
+
     const queryClient = useQueryClient();
     const toast = useToast();
+
     const [pendingAfterLogin, setPendingAfterLogin] = useState(false);
 
     const handleAfterLogin = useCallback(
@@ -96,7 +100,7 @@ export const useLogin = (): UseMutationResult<
                 setPendingAfterLogin(true);
             }
         },
-        onError: (res) => {
+        onError: (res, variables: LoginRequest) => {
             const statusCode = res.response?.data.statusCode;
 
             // Remove user cache on login error to prevent showing old profile
@@ -115,6 +119,11 @@ export const useLogin = (): UseMutationResult<
                         'Đăng nhập thất bại',
                         'Tài khoản của bạn chưa được xác minh. Vui lòng kiểm tra email để hoàn tất xác minh.'
                     );
+
+                    resendVerificationEmail({
+                        email: variables.email,
+                        clientUrl: process.env.EXPO_PUBLIC_CLIENT_URL,
+                    });
                     break;
                 case StatusCode.USER_ACCOUNT_LOCKED:
                     toast.error(
@@ -139,7 +148,6 @@ export const useLogout = (): UseMutationResult<
 
     return useMutation<void, AxiosError<BaseResponse>, void>({
         mutationFn: async () => {
-            // await logout();
             await callGlobalLogout();
         },
         onSuccess: () => {

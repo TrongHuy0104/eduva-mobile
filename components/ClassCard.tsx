@@ -58,7 +58,7 @@ const ClassCard = ({ classItem }: { classItem: ClassModel }) => {
                             size={14}
                             color="#666"
                         />
-                        <Text>55</Text>
+                        <Text>{classItem.countLessonMaterial}</Text>
                     </View>
                 </View>
             </View>

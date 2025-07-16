@@ -1,12 +1,11 @@
 import { windowWidth } from '@/constants/app.constants';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import LoginForm from './LoginForm';
 
 const AuthFormWrapper = () => {
-    const [modalName, setModalName] = useState('login');
     return (
         <View>
             {/* Logo */}
@@ -24,7 +23,7 @@ const AuthFormWrapper = () => {
                     />
                 </Pressable>
             </View>
-            {modalName === 'login' && <LoginForm />}
+            <LoginForm />
             <Text style={styles.terms}>
                 Việc bạn tiếp tục sử dụng trang web này đồng nghĩa bạn đồng ý
                 với điều khoản sử dụng của chúng tôi

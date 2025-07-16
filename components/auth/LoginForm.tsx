@@ -6,7 +6,6 @@ import { useForm } from 'react-hook-form';
 import {
     ActivityIndicator,
     Keyboard,
-    Pressable,
     StyleSheet,
     Text,
     TouchableOpacity,
@@ -134,10 +133,6 @@ const LoginForm = () => {
                         </Text>
                     </LinearGradient>
                 </TouchableOpacity>
-
-                <Pressable>
-                    <Text style={styles.forgotPassword}>Quên mật khẩu?</Text>
-                </Pressable>
             </View>
         </View>
     );
@@ -170,13 +165,5 @@ const styles = StyleSheet.create({
     container: {
         minHeight: 122,
         paddingBottom: 30,
-    },
-    forgotPassword: {
-        marginTop: 20,
-        textAlign: 'center',
-        fontSize: 14,
-        fontWeight: '600',
-        color: '#2093e7',
-        textDecorationLine: 'underline',
     },
 });
