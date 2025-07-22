@@ -105,6 +105,7 @@ export const useLogin = (): UseMutationResult<
 
             // Remove user cache on login error to prevent showing old profile
             queryClient.removeQueries({ queryKey: ['user'] });
+            console.log('statusCode', res);
 
             switch (statusCode) {
                 case StatusCode.USER_NOT_EXISTS:
@@ -133,7 +134,7 @@ export const useLogin = (): UseMutationResult<
 
                     break;
                 default:
-                    toast.errorGeneral();
+                // toast.errorGeneral();
             }
         },
     });

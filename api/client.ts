@@ -25,9 +25,15 @@ client.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
+        console.log('originalRequest', originalRequest);
+        console.log('error.response?.status', error.response?.status);
 
         // Only handle 401 errors for auth endpoints
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        if (
+            error.response?.status === 401 &&
+            !originalRequest._retry &&
+            originalRequest.url !== '/auth/login'
+        ) {
             originalRequest._retry = true;
 
             try {
