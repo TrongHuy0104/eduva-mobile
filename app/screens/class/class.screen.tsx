@@ -12,6 +12,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 const ClassScreen = ({ classId }: { classId: string }) => {
     const toast = useToast();
+    const [isRedirecting, setIsRedirecting] = useState(false);
     const {
         data: studentClass,
         error: studentClassError,
@@ -73,33 +74,44 @@ const ClassScreen = ({ classId }: { classId: string }) => {
     }
 
     const redirect = async () => {
-        if (studentClass?.countLessonMaterial === 0) {
-            toast.error(
-                'Lớp học trống',
-                'Chưa có bài học nào được thêm vào lớp học này!'
-            );
-        } else {
-            const lastLesson = await getLastLesson(classId);
+        if (isRedirecting) return; // Prevent multiple redirects
+        
+        try {
+            setIsRedirecting(true);
 
-            if (lastLesson) {
-                router.push(
-                    // @ts-ignore
-                    `/learn/${lastLesson.material}?classId=${classId}&folderId=${lastLesson.folder}`
+            if (studentClass?.countLessonMaterial === 0) {
+                toast.error(
+                    'Lớp học trống',
+                    'Chưa có bài học nào được thêm vào lớp học này!'
                 );
             } else {
-                const folderHasLesson = folders.find(
-                    (folder) => folder.countLessonMaterial > 0
-                );
+                const lastLesson = await getLastLesson(classId);
 
-                if (!folderHasLesson) return;
+                if (lastLesson) {
+                    router.replace(
+                        // @ts-ignore
+                        `/learn/${lastLesson.material}?classId=${classId}&folderId=${lastLesson.folder}`
+                    );
+                } else {
+                    const folderHasLesson = folders.find(
+                        (folder) => folder.countLessonMaterial > 0
+                    );
 
-                setIsEnabledLoadMaterial(true);
+                    if (!folderHasLesson) return;
 
-                router.push(
-                    // @ts-ignore
-                    `/learn/${lessonMaterials[0].id}?classId=${classId}&folderId=${folderHasLesson.id}`
-                );
+                    setIsEnabledLoadMaterial(true);
+
+                    router.replace(
+                        // @ts-ignore
+                        `/learn/${lessonMaterials[0].id}?classId=${classId}&folderId=${folderHasLesson.id}`
+                    );
+                }
             }
+        } finally {
+            // Reset after a short delay to prevent rapid re-taps
+            setTimeout(() => {
+                setIsRedirecting(false);
+            }, 1000);
         }
     };
 
@@ -173,9 +185,10 @@ const ClassScreen = ({ classId }: { classId: string }) => {
                                 paddingHorizontal: 10,
                                 marginBottom: 12,
                             },
-                            { opacity: pressed ? 0.7 : 1 },
+                            { opacity: pressed && !isRedirecting ? 0.7 : isRedirecting ? 0.5 : 1 },
                         ]}
                         onPress={redirect}
+                        disabled={isRedirecting}
                     >
                         <Text
                             style={{

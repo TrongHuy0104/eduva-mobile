@@ -1,26 +1,59 @@
 import { useVideoPlayer, VideoView } from 'expo-video';
+import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
-export default function VideoViewer({
-    videoSource,
-}: Readonly<{ videoSource: string }>) {
-    const player = useVideoPlayer(videoSource, (player) => {
-        player.loop = true;
-        player.play();
-    });
+const VideoViewer = React.forwardRef(
+    (
+        { videoSource }: Readonly<{ videoSource: string }>,
+        ref: React.Ref<any>
+    ) => {
+        const player = useVideoPlayer(videoSource, (player) => {
+            player.loop = true;
+            player.play();
+        });
 
-    return (
-        <View style={styles.contentContainer}>
-            <VideoView
-                style={styles.video}
-                player={player}
-                allowsFullscreen
-                allowsPictureInPicture
-                nativeControls={true}
-            />
-        </View>
-    );
-}
+        React.useImperativeHandle(ref, () => ({
+            pause: () => {
+                try {
+                    player?.pause();
+                } catch (error) {
+                    console.log('Error pausing video:', error);
+                }
+            },
+            play: () => {
+                try {
+                    player?.play();
+                } catch (error) {
+                    console.log('Error playing video:', error);
+                }
+            }
+        }));
+
+        React.useEffect(() => {
+            return () => {
+                try {
+                    player?.pause();
+                } catch (error) {
+                    console.log('Error cleaning up video:', error);
+                }
+            };
+        }, [player]);
+
+        return (
+            <View style={styles.contentContainer}>
+                <VideoView
+                    style={styles.video}
+                    player={player}
+                    allowsFullscreen
+                    allowsPictureInPicture
+                    nativeControls={true}
+                />
+            </View>
+        );
+    }
+);
+
+VideoViewer.displayName = 'VideoViewer'; // Add this line
 
 const styles = StyleSheet.create({
     contentContainer: {
@@ -32,3 +65,5 @@ const styles = StyleSheet.create({
         height: '100%',
     },
 });
+
+export default VideoViewer;
