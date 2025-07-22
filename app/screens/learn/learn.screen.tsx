@@ -7,7 +7,8 @@ import VideoViewer from '@/components/learn/VideoViewer';
 import { useFolders } from '@/hooks/useFolder';
 import { useLessonMaterialById } from '@/hooks/useLessonMaterial';
 import { ContentType } from '@/types/enums/lesson-material.enum';
-import React, { useState } from 'react';
+import { useIsFocused } from '@react-navigation/native';
+import React, { useRef, useState } from 'react';
 import { Dimensions, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 interface LearnScreenProps {
@@ -19,8 +20,10 @@ interface LearnScreenProps {
 const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
     const { data: material } = useLessonMaterialById(materialId);
     const { data: folders } = useFolders(classId);
-
     const [sidebarVisible, setSidebarVisible] = useState(false);
+    const videoRef = useRef<any>(null);
+    const audioRef = useRef<any>(null);
+    const isFocused = useIsFocused();
 
     const formatUpdateDate = (input?: string | null): string => {
         if (!input) return 'Bài học chưa được cập nhật';
@@ -42,19 +45,39 @@ const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
         ) {
             return 500;
         }
-        if (
-            material?.contentType === ContentType.Video ||
-            material?.contentType === ContentType.Audio
-        ) {
-            // 16:9 aspect ratio
+        if (material?.contentType === ContentType.Video) {
             return (screenWidth / 16) * 9;
         }
         if (material?.contentType === ContentType.Audio) {
             return 320;
         }
-        // Default height if needed
         return 425;
     };
+
+    // Clean up and pause media when screen loses focus or unmounts
+    React.useEffect(() => {
+        const cleanup = () => {
+            try {
+                if (videoRef.current) {
+                    videoRef.current.pause();
+                }
+                if (audioRef.current) {
+                    audioRef.current.pause();
+                }
+            } catch (error) {
+                console.log('Error cleaning up media:', error);
+            }
+        };
+
+        if (!isFocused) {
+            cleanup();
+        }
+
+        // Cleanup on component unmount
+        return () => {
+            cleanup();
+        };
+    }, [isFocused]);
 
     return (
         <View style={styles.container}>
@@ -70,6 +93,7 @@ const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
                     >
                         {material?.contentType === ContentType.Video && (
                             <VideoViewer
+                                ref={videoRef}
                                 videoSource={material?.sourceUrl ?? ''}
                             />
                         )}
@@ -80,7 +104,10 @@ const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
                             <DocViewer docSource={material?.sourceUrl ?? ''} />
                         )}
                         {material?.contentType === ContentType.Audio && (
-                            <AudioListener uri={material?.sourceUrl ?? ''} />
+                            <AudioListener
+                                ref={audioRef}
+                                uri={material?.sourceUrl ?? ''}
+                            />
                         )}
                     </View>
                 </View>
@@ -108,8 +135,6 @@ const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
     );
 };
 
-export default LearnScreen;
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -121,11 +146,11 @@ const styles = StyleSheet.create({
     mediaContainer: {
         position: 'relative',
         backgroundColor: '#000',
-        height: 425, // Fixed height to accommodate PDF viewer + margin
+        height: 425,
     },
     content: {
         paddingHorizontal: 16,
-        paddingBottom: 60, // Add padding to prevent content from being hidden behind the button
+        paddingBottom: 60,
     },
     title: {
         fontSize: 24,
@@ -145,3 +170,5 @@ const styles = StyleSheet.create({
         marginVertical: 10,
     },
 });
+
+export default LearnScreen;

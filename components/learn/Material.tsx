@@ -4,7 +4,7 @@ import { Folder } from '@/types/models/folder.model';
 import { LessonMaterial } from '@/types/models/lesson-material.model';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
-import React from 'react';
+import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 interface MaterialProps {
@@ -26,6 +26,7 @@ const Material = ({
 }: MaterialProps) => {
     const { setLastLesson } = useLastMaterialTracking();
     const { id: materialId, folderId } = useLocalSearchParams();
+    const [isRedirecting, setIsRedirecting] = useState(false);
 
     const getIcon = () => {
         if (material.contentType === ContentType.DOCX) {
@@ -47,14 +48,28 @@ const Material = ({
             .padStart(2, '0')}`;
     };
 
-    const redirect = () => {
-        onClose();
-        setLastLesson(folder.classId + '', folder.id + '', material.id);
+    const redirect = async () => {
+        if (isRedirecting) return; // Prevent multiple redirects
 
-        router.push(
-            // @ts-ignore
-            `/learn/${material.id}?classId=${folder.classId}&folderId=${folder.id}`
-        );
+        try {
+            setIsRedirecting(true);
+            onClose();
+            await setLastLesson(
+                folder.classId + '',
+                folder.id + '',
+                material.id
+            );
+
+            router.push(
+                // @ts-ignore
+                `/learn/${material.id}?classId=${folder.classId}&folderId=${folder.id}`
+            );
+        } finally {
+            // Reset after a short delay to prevent rapid re-taps
+            setTimeout(() => {
+                setIsRedirecting(false);
+            }, 1000);
+        }
     };
 
     const isCurrentMaterial =
@@ -63,11 +78,16 @@ const Material = ({
     return (
         <Pressable
             onPress={redirect}
+            disabled={isRedirecting || isCurrentMaterial}
             style={({ pressed }) => [
                 styles.material,
-                { backgroundColor: pressed ? '#32353b' : '#272a31' },
+                {
+                    backgroundColor:
+                        pressed && !isRedirecting ? '#32353b' : '#272a31',
+                },
                 {
                     backgroundColor: isCurrentMaterial ? '#181d1e' : '#272a31',
+                    opacity: isRedirecting ? 0.5 : 1,
                 },
             ]}
         >

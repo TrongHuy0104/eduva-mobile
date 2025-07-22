@@ -133,7 +133,7 @@ export const useLogin = (): UseMutationResult<
 
                     break;
                 default:
-                    toast.errorGeneral();
+                // toast.errorGeneral();
             }
         },
     });

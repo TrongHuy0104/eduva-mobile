@@ -3,7 +3,7 @@ import { ContentType } from '@/types/enums/lesson-material.enum';
 import { LessonMaterial } from '@/types/models/lesson-material.model';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React from 'react';
+import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 interface MaterialProps {
@@ -15,6 +15,7 @@ interface MaterialProps {
 
 const Material = ({ material, classId, index, folderId }: MaterialProps) => {
     const { setLastLesson } = useLastMaterialTracking();
+    const [isRedirecting, setIsRedirecting] = useState(false);
 
     const formatSeconds = (seconds: number) => {
         const mins = Math.floor(seconds / 60);
@@ -24,13 +25,22 @@ const Material = ({ material, classId, index, folderId }: MaterialProps) => {
             .padStart(2, '0')}`;
     };
 
-    const redirect = () => {
-        setLastLesson(classId, folderId, material.id);
-
-        router.push(
-            // @ts-ignore
-            `/learn/${material.id}?classId=${classId}&folderId=${folderId}`
-        );
+    const redirect = async () => {
+        if (isRedirecting) return; // Prevent multiple redirects
+        
+        try {
+            setIsRedirecting(true);
+            await setLastLesson(classId, folderId, material.id);
+            router.push(
+                // @ts-ignore
+                `/learn/${material.id}?classId=${classId}&folderId=${folderId}`
+            );
+        } finally {
+            // Reset after a short delay to prevent rapid re-taps
+            setTimeout(() => {
+                setIsRedirecting(false);
+            }, 1000);
+        }
     };
 
     const getIcon = () => {
@@ -47,10 +57,12 @@ const Material = ({ material, classId, index, folderId }: MaterialProps) => {
     return (
         <Pressable
             style={({ pressed }) => [
-                pressed && styles.buttonPressed,
+                pressed && !isRedirecting && styles.buttonPressed,
                 styles.materialItem,
+                isRedirecting && styles.disabled
             ]}
             onPress={redirect}
+            disabled={isRedirecting}
         >
             <View
                 style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}
@@ -85,6 +97,9 @@ const styles = StyleSheet.create({
         marginTop: 8,
         minHeight: 48,
         borderRadius: 6,
+    },
+    disabled: {
+        opacity: 0.6,
     },
     materialIcon: {
         alignItems: 'center',

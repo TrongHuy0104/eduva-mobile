@@ -1,11 +1,21 @@
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
 import { Audio } from 'expo-av';
-import React, { useEffect, useRef, useState } from 'react';
+import React, {
+    forwardRef,
+    useEffect,
+    useImperativeHandle,
+    useRef,
+    useState,
+} from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface AudioListenerProps {
     uri: string;
+}
+
+export interface AudioListenerRef {
+    pause: () => Promise<void>;
 }
 
 const PLAYBACK_SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 4];
@@ -16,10 +26,21 @@ const formatTime = (seconds: number) => {
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
 };
 
-const AudioListener: React.FC<AudioListenerProps> = ({ uri }) => {
+const AudioListener = (
+    { uri }: AudioListenerProps,
+    ref: React.Ref<AudioListenerRef>
+) => {
     const [sound, setSound] = useState<Audio.Sound | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [duration, setDuration] = useState(0);
+
+    useImperativeHandle(ref, () => ({
+        pause: async () => {
+            if (sound && isPlaying) {
+                await sound.pauseAsync();
+            }
+        },
+    }));
     const [position, setPosition] = useState(0);
     const [volume, setVolume] = useState(1);
     const [showSpeedMenu, setShowSpeedMenu] = useState(false);
@@ -141,8 +162,11 @@ const AudioListener: React.FC<AudioListenerProps> = ({ uri }) => {
             if (debounceVolumeRef.current) {
                 clearTimeout(debounceVolumeRef.current);
             }
+            if (sound && isPlaying) {
+                sound.pauseAsync();
+            }
         };
-    }, []);
+    }, [sound, isPlaying]);
 
     return (
         <View style={styles.wrapper}>
@@ -347,4 +371,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default AudioListener;
+export default forwardRef<AudioListenerRef, AudioListenerProps>(AudioListener);
