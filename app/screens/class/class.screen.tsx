@@ -1,13 +1,12 @@
 import Folder from '@/components/class/Folder';
 import ClassDetailSkeleton from '@/components/skeleton/ClassDetailSkeleton';
 import { useStudentClassById } from '@/hooks/useClass';
-import { useFolders } from '@/hooks/useFolder';
 import { useLastMaterialTracking } from '@/hooks/useLastMaterialTracking';
-import { useLessonMaterials } from '@/hooks/useLessonMaterial';
+import { useAllFoldersAndLessonMaterials } from '@/hooks/useLessonMaterial';
 import { useToast } from '@/hooks/useToast';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 const ClassScreen = ({ classId }: { classId: string }) => {
@@ -20,67 +19,24 @@ const ClassScreen = ({ classId }: { classId: string }) => {
     } = useStudentClassById(classId);
 
     const {
-        data: folders,
-        error: foldersError,
-        isPending: isLoadingFolders,
-    } = useFolders(classId);
+        data: foldersAndLessonMaterials,
+        error: foldersLessonMaterialsError,
+        isPending: isLoadingFoldersLessonMaterials,
+    } = useAllFoldersAndLessonMaterials(classId);
 
-    const [isEnabledLoadMaterial, setIsEnabledLoadMaterial] = useState(false);
+    const { getLastLesson } = useLastMaterialTracking();
 
-    const { data: lessonMaterials, error: lessonMaterialsError } =
-        useLessonMaterials(
-            folders[0]?.id,
-            {
-                classId,
-                folderId: folders[0]?.id,
-                sortBy: 'lastmodifiedat',
-                sortDirection: 'asc',
-            },
-            isEnabledLoadMaterial
-        );
-
-    const { setLastLesson, getLastLesson } = useLastMaterialTracking();
-
-    // Track lesson materials when they are successfully loaded
-    useEffect(() => {
-        if (
-            lessonMaterials &&
-            lessonMaterials.length > 0 &&
-            isEnabledLoadMaterial
-        ) {
-            const folderHasLesson = folders?.find(
-                (folder) => folder.countLessonMaterial > 0
-            );
-
-            if (folderHasLesson) {
-                // Set the first lesson as the last accessed lesson
-                setLastLesson(
-                    classId,
-                    folderHasLesson?.id,
-                    lessonMaterials?.[0]?.id
-                );
-            }
-        }
-    }, [
-        lessonMaterials,
-        isEnabledLoadMaterial,
-        folders,
-        classId,
-        setLastLesson,
-    ]);
-
-    if (studentClassError || foldersError || lessonMaterialsError) {
-        toast.errorGeneral();
-    }
+    if (studentClassError || foldersLessonMaterialsError)
+        return toast.errorGeneral();
 
     const redirect = async () => {
         if (isRedirecting) return; // Prevent multiple redirects
-        
+
         try {
             setIsRedirecting(true);
 
             if (studentClass?.countLessonMaterial === 0) {
-                toast.error(
+                toast.info(
                     'Lớp học trống',
                     'Chưa có bài học nào được thêm vào lớp học này!'
                 );
@@ -93,17 +49,17 @@ const ClassScreen = ({ classId }: { classId: string }) => {
                         `/learn/${lastLesson.material}?classId=${classId}&folderId=${lastLesson.folder}`
                     );
                 } else {
-                    const folderHasLesson = folders.find(
-                        (folder) => folder.countLessonMaterial > 0
+                    if (!foldersAndLessonMaterials) return;
+
+                    const folderHasLesson = foldersAndLessonMaterials.find(
+                        (folder) => folder.countLessonMaterials > 0
                     );
 
                     if (!folderHasLesson) return;
 
-                    setIsEnabledLoadMaterial(true);
-
                     router.replace(
                         // @ts-ignore
-                        `/learn/${lessonMaterials[0].id}?classId=${classId}&folderId=${folderHasLesson.id}`
+                        `/learn/${folderHasLesson[0].id}?classId=${classId}&folderId=${folderHasLesson.id}`
                     );
                 }
             }
@@ -115,9 +71,34 @@ const ClassScreen = ({ classId }: { classId: string }) => {
         }
     };
 
+    const getTotalDurationFormatted = (): string => {
+        let totalDuration = 0;
+
+        if (!foldersAndLessonMaterials) return '0 phút';
+
+        foldersAndLessonMaterials.forEach((group) => {
+            group.lessonMaterials.forEach((material) => {
+                totalDuration += material.duration || 0;
+            });
+        });
+
+        const hours = Math.floor(totalDuration / 3600);
+        const minutes = Math.floor((totalDuration % 3600) / 60);
+
+        if (hours >= 1) {
+            const paddedHours = String(hours).padStart(2, '0');
+            const paddedMinutes = String(minutes).padStart(2, '0');
+            return `${paddedHours} giờ ${paddedMinutes} phút`;
+        } else if (minutes > 0) {
+            return `${minutes} phút`;
+        } else {
+            return `0 phút`;
+        }
+    };
+
     return (
         <View style={styles.container}>
-            {isLoadingStudentClass || isLoadingFolders ? (
+            {isLoadingStudentClass || isLoadingFoldersLessonMaterials ? (
                 <ClassDetailSkeleton />
             ) : (
                 <>
@@ -158,12 +139,12 @@ const ClassScreen = ({ classId }: { classId: string }) => {
                             <Text style={{ fontSize: 16 }}>
                                 <Text>Thời lượng </Text>
                                 <Text style={{ fontWeight: '600' }}>
-                                    01 giờ 34 phút
+                                    {getTotalDurationFormatted()}
                                 </Text>{' '}
                             </Text>
                         </View>
 
-                        {folders?.map((folder, index) => (
+                        {foldersAndLessonMaterials?.map((folder, index) => (
                             <Folder
                                 key={folder.id}
                                 folder={folder}
@@ -185,7 +166,14 @@ const ClassScreen = ({ classId }: { classId: string }) => {
                                 paddingHorizontal: 10,
                                 marginBottom: 12,
                             },
-                            { opacity: pressed && !isRedirecting ? 0.7 : isRedirecting ? 0.5 : 1 },
+                            {
+                                opacity:
+                                    pressed && !isRedirecting
+                                        ? 0.7
+                                        : isRedirecting
+                                        ? 0.5
+                                        : 1,
+                            },
                         ]}
                         onPress={redirect}
                         disabled={isRedirecting}
