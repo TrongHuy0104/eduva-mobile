@@ -1,5 +1,4 @@
-import { useLessonMaterials } from '@/hooks/useLessonMaterial';
-import { Folder as FolderModel } from '@/types/models/folder.model';
+import { FoldersLessonMaterialsResponse } from '@/types/responses/folders-lesson-materials-response';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
@@ -14,27 +13,16 @@ import {
 import Material from './Material';
 
 interface FolderProps {
-    folder: FolderModel;
+    folder: FoldersLessonMaterialsResponse;
     index: number;
     onClose: () => void;
     isActive: boolean;
 }
 
 const Folder = ({ folder, index, onClose, isActive }: FolderProps) => {
-    const { classId: currentClassId, folderId: currentFolderId } =
-        useLocalSearchParams();
+    const { folderId: currentFolderId } = useLocalSearchParams();
 
-    const [isExpanded, setIsExpanded] = useState(
-        currentClassId === folder.classId && currentFolderId === folder.id
-    );
-
-    const { data: lessonMaterials } = useLessonMaterials(
-        folder.id,
-        {
-            classId: folder.classId,
-        },
-        isExpanded
-    );
+    const [isExpanded, setIsExpanded] = useState(currentFolderId === folder.id);
 
     const rotateAnim = useRef(new Animated.Value(0)).current;
 
@@ -56,6 +44,28 @@ const Folder = ({ folder, index, onClose, isActive }: FolderProps) => {
         outputRange: ['0deg', '180deg'],
     });
 
+    const getFolderDurationFormatted = () => {
+        let totalDuration = 0;
+    
+        folder.lessonMaterials?.forEach(material => {
+          totalDuration += material.duration || 0;
+        });
+    
+        const hours = Math.floor(totalDuration / 3600);
+        const minutes = Math.floor((totalDuration % 3600) / 60);
+    
+        if (hours >= 1) {
+          const paddedHours = String(hours).padStart(2, '0');
+          const paddedMinutes = String(minutes).padStart(2, '0');
+          return `${paddedHours} giờ ${paddedMinutes} phút`;
+        } else if (minutes > 0) {
+          return `${minutes} phút`;
+        } else {
+          return `0 phút`;
+        }
+      };
+
+
     return (
         <View>
             <Pressable
@@ -74,7 +84,7 @@ const Folder = ({ folder, index, onClose, isActive }: FolderProps) => {
                         style={{ flexDirection: 'row', alignItems: 'center' }}
                     >
                         <Text style={styles.folderDesc}>
-                            {folder.countLessonMaterial} bài
+                            {folder.countLessonMaterials} bài
                         </Text>
                         <Text
                             style={[
@@ -84,7 +94,7 @@ const Folder = ({ folder, index, onClose, isActive }: FolderProps) => {
                         >
                             |
                         </Text>
-                        <Text style={styles.folderDesc}>23:12</Text>
+                        <Text style={styles.folderDesc}>{getFolderDurationFormatted()}</Text>
                     </View>
                 </View>
                 <Animated.View style={{ transform: [{ rotate }] }}>
@@ -95,16 +105,18 @@ const Folder = ({ folder, index, onClose, isActive }: FolderProps) => {
             {/* Materials */}
             {isExpanded && (
                 <View>
-                    {lessonMaterials?.map((material, materialIndex) => (
-                        <Material
-                            key={material.id}
-                            index={materialIndex}
-                            folderIndex={index}
-                            material={material}
-                            onClose={onClose}
-                            folder={folder}
-                        />
-                    ))}
+                    {folder.lessonMaterials?.map((material, materialIndex) => {
+                        return (
+                            <Material
+                                key={material.id}
+                                index={materialIndex}
+                                folderIndex={index}
+                                material={material}
+                                onClose={onClose}
+                                folder={folder}
+                            />
+                        );
+                    })}
                 </View>
             )}
         </View>

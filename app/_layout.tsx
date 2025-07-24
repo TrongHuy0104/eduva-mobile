@@ -1,3 +1,5 @@
+import { LessonDataProvider } from '@/contexts/lesson-data.context';
+import { SearchProvider } from '@/contexts/search.context';
 import {
     Roboto_300Light,
     Roboto_400Regular,
@@ -46,12 +48,16 @@ const Layout = () => {
     return (
         <QueryClientProvider client={queryClient}>
             <AuthProvider>
-                <ModalProvider>
-                    <Stack screenOptions={{ headerShown: false }}>
-                        <Stack.Screen name="index" />
-                        <Stack.Screen name="(tabs)" />
-                    </Stack>
-                </ModalProvider>
+                <LessonDataProvider>
+                    <SearchProvider>
+                        <ModalProvider>
+                            <Stack screenOptions={{ headerShown: false }}>
+                                <Stack.Screen name="index" />
+                                <Stack.Screen name="(tabs)" />
+                            </Stack>
+                        </ModalProvider>
+                    </SearchProvider>
+                </LessonDataProvider>
             </AuthProvider>
         </QueryClientProvider>
     );

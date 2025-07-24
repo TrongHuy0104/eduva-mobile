@@ -1,7 +1,8 @@
+import { useSearch } from '@/contexts/search.context';
 import { useLastMaterialTracking } from '@/hooks/useLastMaterialTracking';
 import { ContentType } from '@/types/enums/lesson-material.enum';
-import { Folder } from '@/types/models/folder.model';
 import { LessonMaterial } from '@/types/models/lesson-material.model';
+import { FoldersLessonMaterialsResponse } from '@/types/responses/folders-lesson-materials-response';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
@@ -13,7 +14,8 @@ interface MaterialProps {
     folderIndex: number;
     onClose: () => void;
     isActive?: boolean;
-    folder: Folder;
+    folder: FoldersLessonMaterialsResponse;
+
 }
 
 const Material = ({
@@ -23,10 +25,12 @@ const Material = ({
     onClose,
     folder,
     isActive,
+
 }: MaterialProps) => {
     const { setLastLesson } = useLastMaterialTracking();
-    const { id: materialId, folderId } = useLocalSearchParams();
+    const { id: materialId, folderId, classId } = useLocalSearchParams();
     const [isRedirecting, setIsRedirecting] = useState(false);
+    const { searchTerm, isSearchActive } = useSearch();
 
     const getIcon = () => {
         if (material.contentType === ContentType.DOCX) {
@@ -36,8 +40,7 @@ const Material = ({
         } else if (material.contentType === ContentType.Audio) {
             return 'volume-high';
         } else if (material.contentType === ContentType.Video) {
-            return 'circle-play';
-        }
+            return 'circle-play';        }
     };
 
     const formatSeconds = (seconds: number) => {
@@ -53,17 +56,13 @@ const Material = ({
 
         try {
             setIsRedirecting(true);
-            onClose();
-            await setLastLesson(
-                folder.classId + '',
-                folder.id + '',
-                material.id
-            );
+            await setLastLesson(classId + '', folder.id + '', material.id);
 
             router.push(
                 // @ts-ignore
                 `/learn/${material.id}?classId=${folder.classId}&folderId=${folder.id}`
             );
+            onClose();
         } finally {
             // Reset after a short delay to prevent rapid re-taps
             setTimeout(() => {
@@ -104,9 +103,10 @@ const Material = ({
                     style={[
                         styles.materialTitle,
                         isActive && { color: '#FFD700' },
+                        isSearchActive && { color: '#fff' },
                     ]}
                 >
-                    {folderIndex + 1}.{index + 1} {material.title}
+                    {`${folderIndex + 1}.${index + 1} ${material.title}`}
                 </Text>
                 <Text style={styles.materialTime}>
                     {formatSeconds(material.duration)}

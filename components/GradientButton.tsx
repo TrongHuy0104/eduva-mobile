@@ -60,13 +60,36 @@ export const GradientButton: React.FC<GradientButtonProps> = ({
                 {imgSrc && (
                     <Image
                         source={imgSrc}
-                        style={styles.iconImage}
+                        style={[
+                            styles.iconImage,
+                            isDisabled && { tintColor: '#ff0000' },
+                        ]}
                         accessibilityLabel={tooltipText}
                     />
                 )}
             </View>
         </TouchableOpacity>
     );
+
+    // Helper to clone icon with disabled color if needed
+    const renderIcon = (icon: React.ReactNode) => {
+        if (!icon) return null;
+        if (!isDisabled) return icon;
+        if (React.isValidElement(icon)) {
+            const el = icon as React.ReactElement<any>;
+            // If it's an Image, apply tintColor
+            if (el.type === Image) {
+                return React.cloneElement(el, {
+                    style: [el.props.style, { tintColor: '#b1b1b1' }],
+                });
+            }
+            // For vector icons, merge color into style
+            return React.cloneElement(el, {
+                style: [el.props.style, { color: '#b1b1b1' }],
+            });
+        }
+        return icon;
+    };
 
     const renderTextButton = () => (
         <TouchableOpacity
@@ -80,9 +103,23 @@ export const GradientButton: React.FC<GradientButtonProps> = ({
             disabled={isDisabled}
             activeOpacity={0.8}
         >
-            {iconLeft && <View style={styles.iconWrapper}>{iconLeft}</View>}
-            <Text style={[styles.btnTextContent, textStyle]}>{text}</Text>
-            {iconRight && <View style={styles.iconWrapper}>{iconRight}</View>}
+            {iconLeft && (
+                <View style={styles.iconWrapper}>{renderIcon(iconLeft)}</View>
+            )}
+            <Text
+                style={[
+                    styles.btnTextContent,
+                    textStyle,
+                    isDisabled && styles.btnDisabledText,
+                ]}
+            >
+                {text}
+            </Text>
+            {iconRight && (
+                <View style={[styles.iconWrapper]}>
+                    {renderIcon(iconRight)}
+                </View>
+            )}
         </TouchableOpacity>
     );
 
@@ -99,20 +136,37 @@ export const GradientButton: React.FC<GradientButtonProps> = ({
             activeOpacity={0.8}
         >
             <LinearGradient
-                colors={['#5ebbff', '#a174ff']}
+                colors={
+                    isDisabled
+                        ? ['rgba(94,187,255,0.2)', 'rgba(161,116,255,0.2)']
+                        : ['#5ebbff', '#a174ff']
+                }
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
-                style={styles.gradientBorder}
+                style={[
+                    styles.gradientBorder,
+                    isDisabled && styles.btnDisabledGradient,
+                ]}
             >
                 <View style={styles.outlineContent}>
                     {iconLeft && (
-                        <View style={styles.iconWrapper}>{iconLeft}</View>
+                        <View style={styles.iconWrapper}>
+                            {renderIcon(iconLeft)}
+                        </View>
                     )}
-                    <Text style={[styles.btnTextContent, textStyle]}>
+                    <Text
+                        style={[
+                            styles.btnTextContent,
+                            textStyle,
+                            isDisabled && styles.btnDisabledText,
+                        ]}
+                    >
                         {text}
                     </Text>
                     {iconRight && (
-                        <View style={styles.iconWrapper}>{iconRight}</View>
+                        <View style={styles.iconWrapper}>
+                            {renderIcon(iconRight)}
+                        </View>
                     )}
                 </View>
             </LinearGradient>
@@ -196,8 +250,14 @@ const styles = StyleSheet.create({
         color: '#fff',
     },
     btnDisabled: {
-        backgroundColor: '#e1effe',
-        opacity: 0.6,
+        backgroundColor: 'transparent',
+        opacity: 1,
+    },
+    btnDisabledGradient: {
+        backgroundColor: 'transparent',
+    },
+    btnDisabledText: {
+        color: '#b1b1b1',
     },
     iconWrapper: {
         marginHorizontal: 3,

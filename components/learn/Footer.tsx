@@ -3,13 +3,23 @@ import { BlurView } from 'expo-blur';
 import { Image } from 'expo-image';
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import GradientButton from '../GradientButton';
+import { GradientButton } from '../GradientButton';
 
 interface FooterProps {
     onSidebarOpen?: () => void;
+    onPrev?: () => void;
+    onNext?: () => void;
+    disablePrev?: boolean;
+    disableNext?: boolean;
 }
 
-const Footer = ({ onSidebarOpen }: FooterProps) => {
+const Footer = ({
+    onSidebarOpen,
+    onPrev,
+    onNext,
+    disablePrev,
+    disableNext,
+}: FooterProps) => {
     return (
         <BlurView intensity={80} tint="dark" style={styles.container}>
             <View style={styles.overlay} />
@@ -60,6 +70,8 @@ const Footer = ({ onSidebarOpen }: FooterProps) => {
                             color="white"
                         />
                     }
+                    onPress={onPrev}
+                    isDisabled={disablePrev}
                 ></GradientButton>
                 <GradientButton
                     variant="outline"
@@ -71,6 +83,8 @@ const Footer = ({ onSidebarOpen }: FooterProps) => {
                             color="white"
                         />
                     }
+                    onPress={onNext}
+                    isDisabled={disableNext}
                 ></GradientButton>
             </View>
         </BlurView>
