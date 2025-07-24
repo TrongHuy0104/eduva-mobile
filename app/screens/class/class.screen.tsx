@@ -59,7 +59,7 @@ const ClassScreen = ({ classId }: { classId: string }) => {
 
                     router.replace(
                         // @ts-ignore
-                        `/learn/${folderHasLesson[0].id}?classId=${classId}&folderId=${folderHasLesson.id}`
+                        `/learn/${folderHasLesson.lessonMaterials[0].id}?classId=${classId}&folderId=${folderHasLesson.id}`
                     );
                 }
             }

@@ -108,11 +108,4 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#242424',
     },
-    materialContainer: {
-        width: '100%',
-        height: 40,
-        borderRadius: 8,
-        backgroundColor: '#e0e0e0',
-        marginBottom: 8,
-    },
 });
