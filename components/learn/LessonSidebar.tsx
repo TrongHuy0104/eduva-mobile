@@ -19,7 +19,6 @@ import Folder from './Folder';
 interface LessonSidebarProps {
     visible: boolean;
     onClose: () => void;
-    // folders: FoldersLessonMaterialsResponse[];
 }
 
 const { width } = Dimensions.get('window');

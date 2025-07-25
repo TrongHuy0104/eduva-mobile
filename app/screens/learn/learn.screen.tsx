@@ -1,4 +1,5 @@
 import AudioListener from '@/components/learn/AudioListener';
+import CommentModal from '@/components/learn/CommentModal';
 import DocViewer from '@/components/learn/DocViewer';
 import Footer from '@/components/learn/Footer';
 import LessonSidebar from '@/components/learn/LessonSidebar';
@@ -25,6 +26,7 @@ interface LearnScreenProps {
 const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
     const { data: material } = useLessonMaterialById(materialId);
     const [sidebarVisible, setSidebarVisible] = useState(false);
+    const [commentVisible, setCommentVisible] = useState(false);
     const videoRef = useRef<any>(null);
     const audioRef = useRef<any>(null);
     const isFocused = useIsFocused();
@@ -94,11 +96,6 @@ const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
 
     // Clear search state when switching class
     // clearSearch, prevClassId, setPrevClassId already destructured above
-    console.log('prevClassId:', prevClassId);
-    console.log('classId:', classId);
-    console.log('prevClassIdIsString:', typeof prevClassId === 'string' && prevClassId.length > 0);
-    console.log('classIdIsString:', typeof classId === 'string' && classId.length > 0);
-    console.log('prevClassId !== classId:', prevClassId !== classId);
     useEffect(() => {
         const isValidId = (id: any) =>
             typeof id === 'string' &&
@@ -225,6 +222,7 @@ const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
 
             <Footer
                 onSidebarOpen={() => setSidebarVisible(true)}
+                onCommentOpen={() => setCommentVisible(true)}
                 onPrev={handlePrev}
                 onNext={handleNext}
                 disablePrev={currentIndex <= 0}
@@ -237,6 +235,13 @@ const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
                 visible={sidebarVisible}
                 onClose={() => setSidebarVisible(false)}
             />
+            <CommentModal
+                visible={commentVisible}
+                onClose={() => setCommentVisible(false)}
+                materialTitle={material?.title!}
+                materialId={material?.id!}
+            />
+            
         </View>
     );
 };
