@@ -90,11 +90,18 @@ const CreateQuestionModal: React.FC<CreateQuestionModalProps> = ({ visible, onCl
       lessonMaterialId,
     };
 
-    mutate(createQuestionRequest);
-    setTitle("");
-    setContent("");
-    onClose();
+    mutate(createQuestionRequest, {
+      onSuccess: () => {
+        setTitle("");
+        setContent("");
+        onClose();
+      },
+      onError: (error: any) => {
+        alert('Tạo câu hỏi thất bại. Vui lòng thử lại!');
+      },
+    });
   };
+
 
   return (
     <Modal visible={visible} transparent animationType="slide">
@@ -107,7 +114,7 @@ const CreateQuestionModal: React.FC<CreateQuestionModalProps> = ({ visible, onCl
               <Text style={styles.backText}>Quay lại</Text>
             </TouchableOpacity>
             <Text style={styles.title}>Hỏi đáp</Text>
-             {/* Close button */}
+            {/* Close button */}
             <Pressable
                 onPress={onClose}
                 style={{
@@ -210,8 +217,11 @@ const CreateQuestionModal: React.FC<CreateQuestionModalProps> = ({ visible, onCl
                 variant="outline"
                 text="ĐĂNG CÂU HỎI"
                 onPress={handleSubmit}
+                iconRight={isPending ? (
+                  <FontAwesome6 name="spinner" size={18} color="#fff" spin />
+                ) : null}
                 style={styles.submitBtn}
-                isDisabled={!title.trim() || !content.trim()}
+                isDisabled={!title.trim() || !content.trim() || isPending}
               />
             </View>
           </ScrollView>
@@ -305,8 +315,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#23262d',
     borderRadius: 0,
-    paddingHorizontal: 24,
-    paddingTop: 24,
+    paddingHorizontal: 16,
+    paddingTop: 16,
     paddingBottom: 0,
   },
   header: {

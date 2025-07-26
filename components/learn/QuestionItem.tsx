@@ -2,25 +2,42 @@ import { Question } from "@/types/models/question.model";
 import { Image } from "expo-image";
 import { Pressable, StyleSheet, Text } from "react-native";
 
- const QuestionItem = ({question}: {question: Question}) => {
+import React, { useState } from 'react';
+import QuestionDetailModal from './QuestionDetailModal';
+
+const QuestionItem = ({question}: {question: Question}) => {
+    const [showDetail, setShowDetail] = useState(false);
     return (
-        
-        <Pressable style={
-            ({ pressed }) => [
-                styles.questionItem,
-                pressed && {backgroundColor: '#32353b'}
-            ]
-        } onPress={() => {}}>
-           {question.commentCount > 0 ? <Image
-                source={require('@/assets/images/circle-check-green.svg')}
-                style={styles.questionIcon}
-            /> : <Image
-                source={require('@/assets/images/circle-question-mark.svg')}
-                style={styles.questionIcon}
-            />}
-            <Text style={styles.questionTitle}>{question.title}</Text>
-        </Pressable>
-    )
+        <>
+            <Pressable
+                style={
+                    ({ pressed }) => [
+                        styles.questionItem,
+                        pressed && {backgroundColor: '#32353b'}
+                    ]
+                }
+                onPress={() => setShowDetail(true)}
+            >
+                {question.commentCount > 0 ? (
+                    <Image
+                        source={require('@/assets/images/circle-check-green.svg')}
+                        style={styles.questionIcon}
+                    />
+                ) : (
+                    <Image
+                        source={require('@/assets/images/circle-question-mark.svg')}
+                        style={styles.questionIcon}
+                    />
+                )}
+                <Text style={styles.questionTitle}>{question.title}</Text>
+            </Pressable>
+            <QuestionDetailModal
+                visible={showDetail}
+                onClose={() => setShowDetail(false)}
+                questionId={question.id}
+            />
+        </>
+    );
 }
 
 const styles = StyleSheet.create({
