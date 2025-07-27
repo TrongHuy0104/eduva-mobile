@@ -25,7 +25,6 @@ const EditQuestionModal: React.FC<EditQuestionModalProps> = ({ visible, onClose,
       if (!visible) {
         setTitle("");
         setContent("");
-        setImages([]);
         setShowLinkDialog(false);
         setLinkUrl("");
         setLinkDisplayText("");
@@ -55,7 +54,6 @@ const EditQuestionModal: React.FC<EditQuestionModalProps> = ({ visible, onClose,
     return html.replace(/<p-image([^>]*)src=(["'])([^"'>]+)\2([^>]*)\/?>(?:<\/p-image>)?/gi,
       '<img$1src=$2$3$2$4 style="max-width:100%;border-radius:8px;margin:8px 0;" />');
   }
-    const [images, setImages] = useState<string[]>([]);
     const richText = React.useRef<RichEditor | null>(null);
 
     // Ensure cssText is applied to initial content
@@ -102,7 +100,6 @@ const EditQuestionModal: React.FC<EditQuestionModalProps> = ({ visible, onClose,
         : asset.uri
     );
   
-    setImages(prev => [...prev, ...newImages]);
     newImages.forEach(imageSrc => {
       richText.current?.insertHTML(`<img src="${imageSrc}" style="max-width:100%;border-radius:8px;margin:8px 0;" />`);
     });
@@ -194,14 +191,14 @@ const EditQuestionModal: React.FC<EditQuestionModalProps> = ({ visible, onClose,
                   iconMap={{
                     [actions.insertImage]: ({ tintColor }: { tintColor?: string }) => (
                       <TouchableOpacity onPress={handleImageUpload}>
-                        <FontAwesome6 name="image" size={18} color={tintColor || '#a2adbd'} style={styles.toolbarIcon} />
+                        <FontAwesome6 name="image" size={18} color={tintColor ?? '#a2adbd'} style={styles.toolbarIcon} />
                       </TouchableOpacity>
                     ),
                     [actions.insertLink]: ({ tintColor }: { tintColor?: string }) => (
                       <TouchableOpacity onPress={() => {
                         setShowLinkDialog(true);
                       }}>
-                        <FontAwesome6 name="link" size={18} color={tintColor || '#a2adbd'} style={styles.toolbarIcon} />
+                        <FontAwesome6 name="link" size={18} color={tintColor ?? '#a2adbd'} style={styles.toolbarIcon} />
                       </TouchableOpacity>
                     )
                   }}
@@ -298,13 +295,14 @@ const EditQuestionModal: React.FC<EditQuestionModalProps> = ({ visible, onClose,
                 <Pressable
                   onPress={() => {
                     const url = linkUrl.trim();
-                    const text = linkDisplayText.trim() || linkUrl.trim();
+                    const text = linkDisplayText.trim() ?? linkUrl.trim();
                     if (!url) {
                       setLinkUrlError("Vui lòng nhập URL liên kết!");
                       return;
                     }
                     // Add protocol if missing
-                    const normalizedUrl = url.match(/^https?:\/\//i) ? url : `https://${url}`;
+                    const urlPattern = /^https?:\/\//i;
+                    const normalizedUrl = urlPattern.exec(url) ? url : `https://${url}`;
                     // Insert link with custom color
                     richText.current?.insertHTML(`<a href="${normalizedUrl}" style="color:#0093fc;text-decoration:underline;" target="_blank">${text}</a>`);
                     setShowLinkDialog(false);

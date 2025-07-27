@@ -7,6 +7,7 @@ import PdfViewer from '@/components/learn/PdfViewer';
 import VideoViewer from '@/components/learn/VideoViewer';
 import { useLessonData } from '@/contexts/lesson-data.context';
 import { useSearch } from '@/contexts/search.context';
+import { useLastMaterialTracking } from '@/hooks/useLastMaterialTracking';
 import {
     useAllFoldersAndLessonMaterials,
     useLessonMaterialById,
@@ -34,6 +35,7 @@ const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
     const { data: foldersAndLessonMaterials } =
         useAllFoldersAndLessonMaterials(classId);
     const { setFolders, folders } = useLessonData();
+    const { setLastLesson } = useLastMaterialTracking();
     const {
         searchResults,
         isSearchActive,
@@ -71,9 +73,10 @@ const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isSearchActive, currentIndex]);
 
-    const goToMaterial = (index: number) => {
+    const goToMaterial = async (index: number) => {
         if (index < 0 || index >= allMaterials.length) return;
         const { material, folder } = allMaterials[index];
+        await setLastLesson(classId, folder.id, material.id);
         router.push(
             `/learn/${material.id}?classId=${classId}&folderId=${folder.id}`
         );

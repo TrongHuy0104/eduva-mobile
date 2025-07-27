@@ -63,53 +63,53 @@ interface DeleteCommentContext {
     previousQuestion: any;
 }
 
+const removeCommentFromCache = (data: any, commentId: string) => {
+    if (!data) return data;
+    
+    const updatedComments = data.comments.filter(
+        (comment: CommentEntity) => comment.id !== commentId
+    );
+    
+    updatedComments.forEach((comment: CommentEntity) => {
+        if (comment.replies) {
+            comment.replies = comment.replies.filter(
+                (reply: any) => reply.id !== commentId
+            );
+        }
+    });
+    
+    return {
+        ...data,
+        comments: updatedComments,
+        totalComments: data.totalComments - 1
+    };
+};
+
 export const useDeleteComment = () => {
     const queryClient = useQueryClient();
     const toast = useToast();
    
+    const handleDeleteComment = (commentId: string) => deleteComment(commentId);
+    
+    const handleMutate = async (commentId: string) => {
+        await queryClient.cancelQueries({ queryKey: ['question'] });
+        const previousQuestion = queryClient.getQueryData(['question']);
+        
+        queryClient.setQueryData(['question'], (old: any) => 
+            removeCommentFromCache(old, commentId)
+        );
+        
+        return { previousQuestion };
+    };
+    
     return useMutation<
         AxiosResponse<BaseResponse<CommentEntity>>,
         Error,
         string,
         DeleteCommentContext
     >({
-        mutationFn: (commentId: string) => {
-            return deleteComment(commentId);
-        },
-        onMutate: async (commentId) => {
-            // Cancel any outgoing refetches
-            await queryClient.cancelQueries({ queryKey: ['question'] });
-            
-            // Snapshot the previous value
-            const previousQuestion = queryClient.getQueryData(['question']);
-            
-            // Optimistically remove the comment from the cache
-            queryClient.setQueryData(['question'], (old: any) => {
-                if (!old) return old;
-                
-                // Remove the comment from the main comments array
-                const updatedComments = old.comments.filter(
-                    (comment: CommentEntity) => comment.id !== commentId
-                );
-                
-                // Also check and remove from replies
-                updatedComments.forEach((comment: CommentEntity) => {
-                    if (comment.replies) {
-                        comment.replies = comment.replies.filter(
-                            (reply: any) => reply.id !== commentId
-                        );
-                    }
-                });
-                
-                return {
-                    ...old,
-                    comments: updatedComments,
-                    totalComments: old.totalComments - 1
-                };
-            });
-            
-            return { previousQuestion };
-        },
+        mutationFn: handleDeleteComment,
+        onMutate: handleMutate,
         onSuccess: (response) => {
             if (!response.data.data) return;
             

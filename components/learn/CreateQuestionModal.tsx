@@ -21,7 +21,6 @@ const CreateQuestionModal: React.FC<CreateQuestionModalProps> = ({ visible, onCl
     if (!visible) {
       setTitle("");
       setContent("");
-      setImages([]);
       setShowLinkDialog(false);
       setLinkUrl("");
       setLinkDisplayText("");
@@ -32,7 +31,6 @@ const CreateQuestionModal: React.FC<CreateQuestionModalProps> = ({ visible, onCl
   }, [visible]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [images, setImages] = useState<string[]>([]);
   const richText = React.useRef<RichEditor | null>(null);
 
   // Custom link dialog state
@@ -68,7 +66,6 @@ const CreateQuestionModal: React.FC<CreateQuestionModalProps> = ({ visible, onCl
       : asset.uri
   );
 
-  setImages(prev => [...prev, ...newImages]);
   newImages.forEach(imageSrc => {
     richText.current?.insertHTML(`<img src="${imageSrc}" style="max-width:100%;border-radius:8px;margin:8px 0;" />`);
   });
@@ -162,14 +159,14 @@ const CreateQuestionModal: React.FC<CreateQuestionModalProps> = ({ visible, onCl
                 iconMap={{
                   [actions.insertImage]: ({ tintColor }: { tintColor?: string }) => (
                     <TouchableOpacity onPress={handleImageUpload}>
-                      <FontAwesome6 name="image" size={18} color={tintColor || '#a2adbd'} style={styles.toolbarIcon} />
+                      <FontAwesome6 name="image" size={18} color={tintColor ?? '#a2adbd'} style={styles.toolbarIcon} />
                     </TouchableOpacity>
                   ),
                   [actions.insertLink]: ({ tintColor }: { tintColor?: string }) => (
                     <TouchableOpacity onPress={() => {
                       setShowLinkDialog(true);
                     }}>
-                      <FontAwesome6 name="link" size={18} color={tintColor || '#a2adbd'} style={styles.toolbarIcon} />
+                      <FontAwesome6 name="link" size={18} color={tintColor ?? '#a2adbd'} style={styles.toolbarIcon} />
                     </TouchableOpacity>
                   )
                 }}
@@ -267,7 +264,7 @@ const CreateQuestionModal: React.FC<CreateQuestionModalProps> = ({ visible, onCl
               <Pressable
                 onPress={() => {
                   const url = linkUrl.trim();
-                  const text = linkDisplayText.trim() || linkUrl.trim();
+                  const text = linkDisplayText.trim() ?? linkUrl.trim();
                   if (!url) {
                     setLinkUrlError("Vui lòng nhập URL liên kết!");
                     return;

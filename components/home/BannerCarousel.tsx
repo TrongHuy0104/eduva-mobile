@@ -12,13 +12,17 @@ import {
     View,
 } from 'react-native';
 
-const BANNERS: {
+interface Banner {
+    id: string;
     style: [string, string, ...string[]];
     title: string;
     description: string;
     buttonContent: string;
-}[] = [
+}
+
+const BANNERS: Banner[] = [
     {
+        id: 'banner-1',
         style: ['#2c8cbc', '#58c8c7'],
         title: 'Lớp Offline tại Hà Nội 👑',
         description:
@@ -26,6 +30,7 @@ const BANNERS: {
         buttonContent: 'Tư vấn miễn phí',
     },
     {
+        id: 'banner-2',
         style: ['#8a0aff', '#6006ff'],
         title: 'Mở bán khóa JavaScript Pro',
         description:
@@ -33,6 +38,7 @@ const BANNERS: {
         buttonContent: 'Học thử miễn phí',
     },
     {
+        id: 'banner-3',
         style: ['#6828fa', '#ffbaa4'],
         title: 'Học HTML CSS cho người mới',
         description:
@@ -40,6 +46,7 @@ const BANNERS: {
         buttonContent: 'Học thử miễn phí',
     },
     {
+        id: 'banner-4',
         style: ['#2877fa', '#6717cd'],
         title: 'Học ReactJS Miễn Phí!',
         description:
@@ -47,6 +54,7 @@ const BANNERS: {
         buttonContent: 'Đăng ký ngay',
     },
     {
+        id: 'banner-5',
         style: ['#7612ff', '#05b2ff'],
         title: 'Thành Quả của Học Viên',
         description:
@@ -168,9 +176,9 @@ const BannerCarousel = () => {
                 onTouchStart={onTouchStart}
                 onTouchEnd={onTouchEnd}
             >
-                {BANNERS.map((item, idx) => (
+                {BANNERS.map((item) => (
                     <View
-                        key={idx}
+                        key={item.id}
                         style={[
                             styles.banner,
                             { width: BANNER_WIDTH, height: 250 },
@@ -195,11 +203,11 @@ const BannerCarousel = () => {
                 ))}
             </ScrollView>
             <View style={styles.dotsContainer}>
-                {BANNERS.map((_, idx) => (
+                {BANNERS.map((item, index) => (
                     <TouchableOpacity
-                        key={idx}
+                        key={`dot-${item.id}`}
                         onPress={() => {
-                            scrollToIndex(idx);
+                            scrollToIndex(index);
                             isAutoScroll.current = true;
                             startAutoScroll();
                         }}

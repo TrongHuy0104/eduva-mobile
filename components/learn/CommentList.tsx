@@ -82,11 +82,6 @@ const CommentList = ({ materialTitle, materialId }: CommentListProps) => {
         return pages;
     };
 
-
-    if (!lessonQuestionsPending) {
-
-    }
-
     return (
         <>
         <View style={styles.container}>

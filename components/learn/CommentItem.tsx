@@ -17,7 +17,6 @@ interface CommentItemProps {
     isBestComment?: boolean;
     style?: StyleProp<ViewStyle>;
     contentWidth?: number;
-    isReply?: boolean;
     questionId?: string;
     commentId?: string;
 }
@@ -29,7 +28,7 @@ export default function CommentItem({
     style,
     questionId,
     commentId,
-}: CommentItemProps) {
+}: Readonly<CommentItemProps>) {
     const [menuVisible, setMenuVisible] = useState(false);
     const [showReplyInput, setShowReplyInput] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
@@ -199,9 +198,9 @@ export default function CommentItem({
                 {/* Menu */}
                 {data.canUpdate && (
                 <View style={styles.menuContainer}>
-                    {data.lastModifiedAt && (
+                    {Boolean(data.lastModifiedAt) && (
                         <Text style={styles.lastModifiedText}>Đã chỉnh sửa</Text>
-                            )}
+                    )}
                     <Pressable
                         style={({pressed}) => ({
                             opacity: pressed ? 0.8 : 1,

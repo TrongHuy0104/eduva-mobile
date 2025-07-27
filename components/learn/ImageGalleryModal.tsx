@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, View, StyleSheet, Image, FlatList, Dimensions, TouchableOpacity } from 'react-native';
+import { Dimensions, FlatList, Image, Modal, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 interface ImageGalleryModalProps {
   visible: boolean;
@@ -11,13 +11,11 @@ interface ImageGalleryModalProps {
 const { width, height } = Dimensions.get('window');
 
 const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({ visible, images, initialIndex = 0, onClose }) => {
-  const [currentIndex, setCurrentIndex] = React.useState(initialIndex);
   const flatListRef = React.useRef<FlatList<string>>(null);
 
   React.useEffect(() => {
     if (visible && flatListRef.current) {
       flatListRef.current.scrollToIndex({ index: initialIndex, animated: false });
-      setCurrentIndex(initialIndex);
     }
   }, [visible, initialIndex]);
 
@@ -42,10 +40,6 @@ const ImageGalleryModal: React.FC<ImageGalleryModalProps> = ({ visible, images, 
           initialScrollIndex={initialIndex}
           renderItem={renderItem}
           keyExtractor={(item, idx) => item + idx}
-          onMomentumScrollEnd={e => {
-            const idx = Math.round(e.nativeEvent.contentOffset.x / width);
-            setCurrentIndex(idx);
-          }}
           showsHorizontalScrollIndicator={false}
         />
         <TouchableOpacity style={styles.closeBtn} onPress={onClose}>

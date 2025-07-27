@@ -1,8 +1,37 @@
 import { FontAwesome6 } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View, ViewStyle } from 'react-native';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View, ViewStyle, TouchableOpacityProps } from 'react-native';
 import { RichEditor, RichToolbar, actions } from 'react-native-pell-rich-editor';
+
+interface ToolbarIconProps {
+  name: string;
+  onPress: () => void;
+  tintColor?: string;
+  size?: number;
+  style?: any;
+}
+
+const ToolbarIcon: React.FC<ToolbarIconProps> = ({
+  name,
+  onPress,
+  tintColor = '#a2adbd',
+  size = 18,
+  style,
+}) => (
+  <TouchableOpacity onPress={onPress}>
+    <FontAwesome6 name={name as any} size={size} color={tintColor} style={[styles.toolbarIcon, style]} />
+  </TouchableOpacity>
+);
+
+// Pre-defined icon components for the toolbar
+const ImageIcon: React.FC<{ tintColor?: string; onPress: () => void }> = ({ tintColor, onPress }) => (
+  <ToolbarIcon name="image" onPress={onPress} tintColor={tintColor} />
+);
+
+const LinkIcon: React.FC<{ tintColor?: string; onPress: () => void }> = ({ tintColor, onPress }) => (
+  <ToolbarIcon name="link" onPress={onPress} tintColor={tintColor} />
+);
 
 export interface RichTextEditorRef {
   getContent: () => string;
@@ -102,7 +131,8 @@ const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(
         return;
       }
 
-      const normalizedUrl = url.match(/^https?:\/\//i) ? url : `https://${url}`;
+      const urlPattern = /^https?:\/\//i;
+      const normalizedUrl = urlPattern.exec(url) ? url : `https://${url}`;
 
       richTextRef.current?.insertHTML(
         `<a href="${normalizedUrl}" style="color:#0093fc;text-decoration:underline;" target="_blank">${text}</a>`
@@ -132,14 +162,10 @@ const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(
           ]}
           iconMap={{
             [actions.insertImage]: ({ tintColor }: { tintColor?: string }) => (
-              <TouchableOpacity onPress={handleAddImage}>
-                <FontAwesome6 name="image" size={18} color={tintColor || '#a2adbd'} style={styles.toolbarIcon} />
-              </TouchableOpacity>
+              <ImageIcon tintColor={tintColor} onPress={handleAddImage} />
             ),
             [actions.insertLink]: ({ tintColor }: { tintColor?: string }) => (
-              <TouchableOpacity onPress={() => setShowLinkDialog(true)}>
-                <FontAwesome6 name="link" size={18} color={tintColor || '#a2adbd'} style={styles.toolbarIcon} />
-              </TouchableOpacity>
+              <LinkIcon tintColor={tintColor} onPress={() => setShowLinkDialog(true)} />
             ),
           }}
           style={styles.toolbar}

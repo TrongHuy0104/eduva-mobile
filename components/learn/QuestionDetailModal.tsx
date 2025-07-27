@@ -26,7 +26,7 @@ import EditQuestionModal from './EditQuestionModal';
 
 // Helper function to replace <p-image src=...> with <img src=...>
 function replacePImageWithImg(html: string): string {
-  return html.replace(/<p-image([^>]*)src=([\'\"])([^\'\"]+)\2([^>]*)>/gi, '<img$1src=$2$3$2$4>');
+  return html.replace(/<p-image([^>]*)src=(["'])([^"']+)\2([^>]*)>/gi, '<img$1src=$2$3$2$4>');
 }
 
 interface QuestionDetailModalProps {
@@ -61,12 +61,6 @@ const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({ visible, onCl
     scrollPosition.current = event.nativeEvent.contentOffset.y;
   }, []);
   
-  const scrollToTop = useCallback(() => {
-    if (scrollViewRef.current) {
-      scrollViewRef.current.scrollTo({ y: 0, animated: true });
-    }
-  }, []);
-
   const { mutate } = useDeleteQuestion()
 
   const deleteQuestion = async () => {

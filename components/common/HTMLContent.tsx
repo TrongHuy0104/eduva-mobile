@@ -11,7 +11,7 @@ import RenderHTML, { HTMLContentModel, HTMLElementModel, MixedStyleRecord } from
 //   return result;
 // }
 function replacePImageWithImg(html: string): string {
-    return html.replace(/<p-image([^>]*)src=([\'\"])([^\'\"]+)\2([^>]*)>/gi, '<img$1src=$2$3$2$4>');
+    return html.replace(/<p-image([^>]*)src=(["'])([^"']+)\2([^>]*)>/gi, '<img$1src=$2$3$2$4>');
   }
 
 // Define custom HTML element models
@@ -160,7 +160,7 @@ const HTMLContent: React.FC<HTMLContentProps> = ({
   return (
     <View style={[styles.container, style]}>
       <RenderHTML
-        contentWidth={contentWidth || width - 40}
+        contentWidth={contentWidth ?? width - 40}
         source={{ html: replacePImageWithImg(content) }}
         customHTMLElementModels={customHTMLElementModels}
         tagsStyles={tagsStyles}

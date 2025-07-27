@@ -26,7 +26,7 @@ const HomeScreen = () => {
     let subjectsRowContent;
     if (isLoadingClasses) {
         subjectsRowContent = Array.from({ length: 6 }).map((_, idx) => (
-            <View style={styles.subjectCol} key={idx}>
+            <View style={styles.subjectCol} key={`skeleton-${idx}`}>
                 <SubjectCardSkeleton />
             </View>
         ));

@@ -14,31 +14,44 @@ interface CommentModalProps {
 const { width } = Dimensions.get('window');
 
 const CommentModal = ({ visible, onClose, materialTitle, materialId }: CommentModalProps) => {
-    const [slideAnim] = React.useState(new Animated.Value(-width));
+    const [isVisible, setIsVisible] = React.useState(false);
+    const slideAnim = React.useRef(new Animated.Value(-width)).current;
 
- React.useEffect(() => {
+    const showModal = React.useCallback(() => {
+        setIsVisible(true);
+        Animated.timing(slideAnim, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+        }).start();
+    }, [slideAnim]);
+
+    const hideModal = React.useCallback((callback?: () => void) => {
+        Animated.timing(slideAnim, {
+            toValue: -width,
+            duration: 300,
+            useNativeDriver: true,
+        }).start(() => {
+            setIsVisible(false);
+            if (callback) callback();
+        });
+    }, [slideAnim]);
+
+    React.useEffect(() => {
         if (visible) {
-            Animated.timing(slideAnim, {
-                toValue: 0,
-                duration: 300,
-                useNativeDriver: true,
-            }).start();
+            showModal();
         } else {
-            Animated.timing(slideAnim, {
-                toValue: -width,
-                duration: 300,
-                useNativeDriver: true,
-            }).start();
+            hideModal();
         }
-    }, [visible, slideAnim]);
+    }, [visible, showModal, hideModal]);
     
     return (
         <Modal
-        visible={visible}
+            visible={isVisible}
             transparent
             animationType="none"
-            onRequestClose={onClose}>
-            <TouchableWithoutFeedback onPress={onClose}>
+            onRequestClose={() => hideModal(onClose)}>
+            <TouchableWithoutFeedback onPress={() => hideModal(onClose)}>
                 <View style={styles.overlay} />
             </TouchableWithoutFeedback>
             <Animated.View
@@ -50,7 +63,7 @@ const CommentModal = ({ visible, onClose, materialTitle, materialId }: CommentMo
 
                     {/* Close button */}
                     <Pressable
-                            onPress={onClose}
+                            onPress={() => hideModal(onClose)}
                             style={{
                                 paddingVertical: 12,
                                 paddingHorizontal: 16,

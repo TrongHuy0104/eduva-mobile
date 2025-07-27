@@ -7,7 +7,7 @@ interface DetailCommentsProps {
     comments: CommentEntity[];
 }
 
-export default function DetailComments({ comments }: DetailCommentsProps) {
+export default function DetailComments({ comments }: Readonly<DetailCommentsProps>) {
     const commentWithMostReplies = (() => {
         const filtered = comments.filter(c => c.replyCount > 0);
         if (filtered.length === 0) return null;
