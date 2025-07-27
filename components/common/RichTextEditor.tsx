@@ -1,7 +1,7 @@
 import { FontAwesome6 } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View, ViewStyle, TouchableOpacityProps } from 'react-native';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { RichEditor, RichToolbar, actions } from 'react-native-pell-rich-editor';
 
 interface ToolbarIconProps {

@@ -199,7 +199,7 @@ const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({ visible, onCl
               {/* Menu */}
               {data.canUpdate && (
                 <View style={styles.menuContainer}>
-                  {data.lastModifiedAt && (
+                  {Boolean(data.lastModifiedAt) && (
                     <Text style={styles.lastModifiedText}>Đã chỉnh sửa</Text>
                   )}
                   <Pressable

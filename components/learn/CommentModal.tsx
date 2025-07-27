@@ -3,8 +3,12 @@ import React from "react";
 import { Animated, Dimensions, Modal, Pressable, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
 import CommentList from "./CommentList";
 
+export interface CommentModalRef {
+    open: () => void;
+    close: (callback?: () => void) => void;
+}
+
 interface CommentModalProps {
-    visible: boolean;
     onClose: () => void;
     materialTitle: string;
     materialId: string;
@@ -13,11 +17,11 @@ interface CommentModalProps {
 
 const { width } = Dimensions.get('window');
 
-const CommentModal = ({ visible, onClose, materialTitle, materialId }: CommentModalProps) => {
+const CommentModal = React.forwardRef<CommentModalRef, CommentModalProps>(({ onClose, materialTitle, materialId }, ref) => {
     const [isVisible, setIsVisible] = React.useState(false);
     const slideAnim = React.useRef(new Animated.Value(-width)).current;
 
-    const showModal = React.useCallback(() => {
+    const open = React.useCallback(() => {
         setIsVisible(true);
         Animated.timing(slideAnim, {
             toValue: 0,
@@ -26,7 +30,7 @@ const CommentModal = ({ visible, onClose, materialTitle, materialId }: CommentMo
         }).start();
     }, [slideAnim]);
 
-    const hideModal = React.useCallback((callback?: () => void) => {
+    const close = React.useCallback((callback?: () => void) => {
         Animated.timing(slideAnim, {
             toValue: -width,
             duration: 300,
@@ -37,21 +41,19 @@ const CommentModal = ({ visible, onClose, materialTitle, materialId }: CommentMo
         });
     }, [slideAnim]);
 
-    React.useEffect(() => {
-        if (visible) {
-            showModal();
-        } else {
-            hideModal();
-        }
-    }, [visible, showModal, hideModal]);
+    // Expose open and close methods via ref
+    React.useImperativeHandle(ref, () => ({
+        open,
+        close,
+    }));
     
     return (
         <Modal
             visible={isVisible}
             transparent
             animationType="none"
-            onRequestClose={() => hideModal(onClose)}>
-            <TouchableWithoutFeedback onPress={() => hideModal(onClose)}>
+            onRequestClose={() => close(onClose)}>
+            <TouchableWithoutFeedback onPress={() => close(onClose)}>
                 <View style={styles.overlay} />
             </TouchableWithoutFeedback>
             <Animated.View
@@ -63,7 +65,7 @@ const CommentModal = ({ visible, onClose, materialTitle, materialId }: CommentMo
 
                     {/* Close button */}
                     <Pressable
-                            onPress={() => hideModal(onClose)}
+                            onPress={() => close(onClose)}
                             style={{
                                 paddingVertical: 12,
                                 paddingHorizontal: 16,
@@ -86,7 +88,9 @@ const CommentModal = ({ visible, onClose, materialTitle, materialId }: CommentMo
             </Animated.View>
         </Modal>
     )
-}
+});
+
+CommentModal.displayName = 'CommentModal';
 
 
 const styles = StyleSheet.create({

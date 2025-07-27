@@ -270,7 +270,7 @@ const CreateQuestionModal: React.FC<CreateQuestionModalProps> = ({ visible, onCl
                     return;
                   }
                   // Add protocol if missing
-                  const normalizedUrl = url.match(/^https?:\/\//i) ? url : `https://${url}`;
+                  const normalizedUrl = /^https?:\/\//i.exec(url) ? url : `https://${url}`;
                   // Insert link with custom color
                   richText.current?.insertHTML(`<a href="${normalizedUrl}" style="color:#0093fc;text-decoration:underline;" target="_blank">${text}</a>`);
                   setShowLinkDialog(false);
