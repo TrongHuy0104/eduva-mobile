@@ -1,15 +1,32 @@
-import { SCREEN_HEIGHT } from '@/constants/app.constants';
+import { useCreateComment } from '@/hooks/useComment';
 import { useDeleteQuestion, useQuestionById } from '@/hooks/useQuestion';
+import { CreateCommentRequest } from '@/types/requests/create-comment-request.model';
 import { formatDateVi } from '@/utils/formatDateVi';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import React from 'react';
-import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { WebView } from 'react-native-webview';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  ActivityIndicator,
+  Modal,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  useWindowDimensions
+} from 'react-native';
+import Toast from 'react-native-toast-message';
+import HTMLContent from '../common/HTMLContent';
+import RichTextEditor, { RichTextEditorRef } from "../common/RichTextEditor";
+import DetailComments from './DetailComments';
+import EditQuestionModal from './EditQuestionModal';
 
 // Helper function to replace <p-image src=...> with <img src=...>
 function replacePImageWithImg(html: string): string {
-  return html.replace(/<p-image([^>]*)src=(['\"])([^'\"]+)\2([^>]*)>/gi, '<img$1src=$2$3$2$4>');
+  return html.replace(/<p-image([^>]*)src=([\'\"])([^\'\"]+)\2([^>]*)>/gi, '<img$1src=$2$3$2$4>');
 }
 
 interface QuestionDetailModalProps {
@@ -18,69 +35,94 @@ interface QuestionDetailModalProps {
   questionId: string | null;
 }
 
-import { useAuth } from '@/contexts/auth.context';
-import Toast from 'react-native-toast-message';
-import EditQuestionModal from './EditQuestionModal';
 
 const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({ visible, onClose, questionId }) => {
-  const showModal = visible && !!questionId;
+  const { width } = useWindowDimensions();
   const { data, isPending } = useQuestionById(questionId ?? '', visible);
-  const [menuVisible, setMenuVisible] = React.useState(false);
-  const [editModalVisible, setEditModalVisible] = React.useState(false);
-  const {user} = useAuth()
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [commentContent, setCommentContent] = useState('');
+  const [showReplyInput, setShowReplyInput] = useState(false);
 
-  const {mutate} = useDeleteQuestion()
+  // Reset state when modal is closed
+  useEffect(() => {
+    if (!visible) {
+      setShowReplyInput(false);
+      setCommentContent('');
+      richTextEditorRef.current?.setContent('');
+    }
+  }, [visible]);
+  const scrollViewRef = useRef<ScrollView>(null);
+  const scrollPosition = useRef(0);
+  const richTextEditorRef = useRef<RichTextEditorRef>(null);
+  const { mutate: createComment, isPending: isCreatingComment } = useCreateComment();
+  
+  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    scrollPosition.current = event.nativeEvent.contentOffset.y;
+  }, []);
+  
+  const scrollToTop = useCallback(() => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollTo({ y: 0, animated: true });
+    }
+  }, []);
 
-  const deleteQuesion = () => {
+  const { mutate } = useDeleteQuestion()
+
+  const deleteQuestion = async () => {
     if (questionId) {
       mutate(questionId, {
         onSuccess: () => {
-          onClose()
+          // Scroll to top before closing
+          if (scrollViewRef.current) {
+            scrollViewRef.current.scrollTo({ y: 0, animated: true });
+          }
+          // Close after a short delay to show the scroll
+          setTimeout(() => {
+            onClose();
+          }, 100);
         }
-      })
+      });
     }
-    
-  }
+  };
 
-  // Injected JS to auto-fit height
-  const injectedJS = `
-    (function() {
-      function getMaxHeight() {
-        var body = document.body, html = document.documentElement;
-        var max = Math.max(
-          body.scrollHeight, body.offsetHeight,
-          html.clientHeight, html.scrollHeight, html.offsetHeight
-        );
-        var all = document.body.getElementsByTagName('*');
-        for (var i = 0; i < all.length; i++) {
-          max = Math.max(max, all[i].offsetTop + all[i].offsetHeight);
-        }
-        return max;
-      }
-      function sendHeight() {
-        var height = getMaxHeight();
-        var ratio = window.devicePixelRatio || 1;
-        window.ReactNativeWebView.postMessage(Math.ceil(height / ratio));
-      }
-      window.addEventListener('load', sendHeight);
-      window.addEventListener('resize', sendHeight);
-      let count = 0;
-      let interval = setInterval(function() {
-        sendHeight();
-        count++;
-        if (count > 10) clearInterval(interval);
-      }, 200);
-      const imgs = document.images;
-      for (let i = 0; i < imgs.length; i++) {
-        imgs[i].onload = imgs[i].onerror = sendHeight;
-      }
-    })();
-  `;
+  const handleReplySubmit = async () => {
+    if (!richTextEditorRef.current || isCreatingComment) return;
+    
+    const content = richTextEditorRef.current.getContent();
+    if (!content.trim()) return;
+    
+    try {
+      const createCommentRequest: CreateCommentRequest = {
+        questionId: questionId!,
+        content: content,
+      };
+      
+      await new Promise<void>((resolve, reject) => {
+        createComment(createCommentRequest, {
+          onSuccess: () => {
+            richTextEditorRef.current?.setContent('');
+            setCommentContent('');
+            resolve();
+          },
+          onError: (error) => {
+            console.error('Failed to post reply:', error);
+            reject(error);
+          }
+        });
+      });
+    } catch (error) {
+      console.error('Error in handleReplySubmit:', error);
+    }
+  };
+
+  const comments = data?.comments ?? [];
 
   return (
-    <Modal visible={showModal} transparent animationType="slide">
+    <Modal visible={visible} transparent animationType="slide">
       <View style={styles.overlay}>
         <View style={styles.modalContent}>
+          {/* Header */}
           <View style={styles.header}>
             <TouchableOpacity onPress={onClose} style={styles.backBtn}>
               <FontAwesome6 name="arrow-left" size={20} color="#1d9ffb" />
@@ -106,12 +148,20 @@ const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({ visible, onCl
                 />
             </Pressable>
           </View>
+
           {!questionId ? (
             <Text style={{ color: '#fff', textAlign: 'center', marginTop: 32 }}>Không tìm thấy dữ liệu câu hỏi.</Text>
           ) : isPending ? (
             <ActivityIndicator size="large" color="#fff" style={{alignSelf: 'center', marginTop: 16}} />
           ) : data ? (
-            <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 32 }} style={{ flex: 1, marginTop: 20 }}>
+            <ScrollView 
+              ref={scrollViewRef}
+              style={{ flex: 1, marginTop: 20 }}
+              contentContainerStyle={{ paddingBottom: 20 }}
+              scrollEventThrottle={16}
+              onScroll={handleScroll}
+              scrollsToTop={true}
+            >
               {/* Question title */}
               <Text style={styles.questionTitle}>{data.title}</Text>
               
@@ -125,7 +175,7 @@ const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({ visible, onCl
                     transition={1000}
                   />
                   <View>
-                    <Text style={styles.questionOwnerName}>{data.createdByName}</Text>
+                    <Text style={[styles.questionOwnerName, {maxWidth: width * 0.5}]} numberOfLines={1} ellipsizeMode="tail">{data.createdByName}</Text>
                     <Text style={styles.questionOwnerTime}>{formatDateVi(data.createdAt)}</Text>
                   </View>
                 </View>
@@ -145,75 +195,143 @@ const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({ visible, onCl
               </View>
 
               {/* Question content */}
-              <View>
-                {data.content ? (
-                  <View style={{backgroundColor: '#191c24', borderRadius: 8, position: 'relative'}}>
-                    {data.canUpdate && <View style={{ flexDirection: 'row', justifyContent: 'flex-end', margin: 4, position: 'absolute', top: -28, right: 0, zIndex: 100 }}>
-                      <>
-                      {data.lastModifiedAt && <Text style={{color: '#4e586b', fontSize: 14, marginRight: 12}}>Đã chỉnh sửa</Text>}
+              <View style={{ flex: 1, marginTop: 12 }}>
+                <HTMLContent 
+                  content={data?.content || ''} 
+                  contentWidth={width - 40} 
+                />
+              </View>
+
+              {/* Menu */}
+              {data.canUpdate && (
+                <View style={styles.menuContainer}>
+                  {data.lastModifiedAt && (
+                    <Text style={styles.lastModifiedText}>Đã chỉnh sửa</Text>
+                  )}
+                  <Pressable
+                    style={({pressed}) => ({
+                      opacity: pressed ? 0.8 : 1,
+                          })}
+                          onPress={() => setMenuVisible((v) => !v)}
+                  >
+                    <FontAwesome6 name="ellipsis" size={22} color="#1d9ffb" />
+                  </Pressable>
+
+                  {menuVisible && (
+                    <View style={styles.menuWrapper}>
+                      {/* Overlay */}
                       <Pressable
-                        style={({pressed}) => ({
-                          opacity: pressed ? 0.8 : 1,
-                        })}
-                        onPress={() => setMenuVisible((v) => !v)}
-                      >
-                        <FontAwesome6 name="ellipsis" size={22} color="#1d9ffb" />
-                      </Pressable>
-                      </>
-                    </View>}
-                    {data.canUpdate && menuVisible && (
-                      <View style={{ position: 'absolute', top: 28, right: 0, zIndex: 100 }}>
-                        {/* Overlay */}
+                        style={styles.menuOverlay}
+                        onPress={() => setMenuVisible(false)}
+                        pointerEvents="auto"
+                      />
+                      {/* Menu */}
+                      <View style={[styles.menu, { width: 140 }]}>
                         <Pressable
-                          style={{
-                            ...StyleSheet.absoluteFillObject,
-                            zIndex: 99,
-                          }}
-                          onPress={() => setMenuVisible(false)}
-                          pointerEvents="auto"
-                        />
-                        {/* Menu */}
-                        <View
-                          style={{
-                            position: 'absolute',
-                            top: -20, 
-                            right: 0,
-                            backgroundColor: '#3b4554',
-                            borderRadius: 10,
-                            width: 140,
-                            elevation: 10,
-                            zIndex: 100,
-                          }}
-                        >
-                          <Pressable onPress={() => { setMenuVisible(false); setEditModalVisible(true); }} style={({pressed}) => ({
-                            backgroundColor: pressed ? '#384250' : undefined,
-                            borderTopLeftRadius: 10,
-                            borderTopRightRadius: 10
-                          })}>
-                            {({ pressed }) => (
-                              <Text style={{ color: pressed ? '#c8d4e0' : '#fff', fontSize: 16, padding: 12, }}>Chỉnh sửa</Text>
-                            )}
-                          </Pressable>
-                          {data.canDelete && <Pressable onPress={() => deleteQuesion()} style={({pressed}) => ({backgroundColor: pressed ? '#384250' : undefined, borderBottomLeftRadius: 10,
-                            borderBottomRightRadius: 10 })}>
-                            {({ pressed }) => (
-                              <Text style={{ color: pressed ? '#c8d4e0' : '#fff', fontSize: 16, padding: 12 }}>Xóa</Text>
-                            )}
-                          </Pressable>}
+                          onPress={() => {
+                            setMenuVisible(false);
+                            setEditModalVisible(true);
+                                }}
+                                style={({ pressed }) => ({
+                                  backgroundColor: pressed ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
+                                  padding: 12,
+                                  flexDirection: 'row',
+                                  alignItems: 'center',
+                                  borderTopLeftRadius: 10,
+                                  borderTopRightRadius: 10,
+                                })}
+                              >
+                                <FontAwesome6 name="pen-to-square" size={16} color="#fff" style={{ marginRight: 8 }} />
+                                <Text style={{ color: '#fff', fontSize: 14 }}>Chỉnh sửa</Text>
+                        </Pressable>
+                        <View style={{ height: 1, backgroundColor: 'rgba(255, 255, 255, 0.1)' }} />
+                        {
+                          data.canDelete && (
+                            <Pressable
+                              onPress={() => {
+                                setMenuVisible(false);
+                                deleteQuestion();
+                                    }}
+                                    style={({ pressed }) => ({
+                                      backgroundColor: pressed ? 'rgba(255, 0, 0, 0.1)' : 'transparent',
+                                      padding: 12,
+                                      flexDirection: 'row',
+                                      alignItems: 'center',
+                                      borderBottomLeftRadius: 10,
+                                      borderBottomRightRadius: 10,
+                                    })}
+                                  >
+                                <FontAwesome6 name="trash" size={16} color="#ff4d4f" style={{ marginRight: 8 }} />
+                                <Text style={{ color: '#fff', fontSize: 14 }}>Xóa</Text>
+                            </Pressable>
+                          )
+                        }
                         </View>
                       </View>
                     )}
-                    <WebView
-                      originWhitelist={["*"]}
-                      source={{ html: `<!DOCTYPE html><html lang='vi'><head><meta name='viewport' content='width=device-width, initial-scale=1.0'><style>html,body{min-height:0;height:auto!important;overflow:visible!important;} body{color:#fff;font-size:16px;font-family:sans-serif;padding:8px;padding-top: 4px;} img, p-image { max-width: 100%; max-height: 300px; height: auto; border-radius: 8px; display: block; object-fit: contain; margin: 0 auto 8px; } pre,code{background:#23262d;color:#fff;border-radius:4px;padding:2px 6px;} blockquote{border-left:3px solid #1d9ffb;padding-left:8px;color:#ccc;} strong{color:#1d9ffb;} </style></head><body>${replacePImageWithImg(data.content)}</body></html>` }}
-                      style={{ width: '100%', height: SCREEN_HEIGHT * 0.65, backgroundColor: 'transparent' }}
-                      showsVerticalScrollIndicator={true}
-                      scrollEnabled={true}
-                    />
-                  </View>
+                </View>
+              )}
+
+              {/* Create My Comment */}
+              <View style={styles.commentInputContainer}>
+                <Image 
+                  source={{ uri: data.createdByAvatar }} 
+                  style={styles.avatar} 
+                />
+                
+                {!showReplyInput ? (
+                  <Pressable 
+                    onPress={() => setShowReplyInput(true)}
+                    style={styles.addCommentButton}
+                  >
+                    <Text style={styles.addCommentText}>Thêm bình luận</Text>
+                  </Pressable>
                 ) : (
-                  <Text style={{ color: '#fff', fontStyle: 'italic', margin: 8 }}>Không có nội dung câu hỏi.</Text>
+                    <View style={styles.replyInputContainer}>
+                    <RichTextEditor
+                        key={`rich-editor-${visible ? 'visible' : 'hidden'}`}
+                        ref={richTextEditorRef}
+                        placeholder="Nhập bình luận mới của bạn..."
+                        style={styles.replyEditor}
+                        editorStyle={[styles.replyEditorContent, {minHeight: 50}]}
+                        initialHeight={50}
+                        onContentChange={setCommentContent}
+                    />
+                    <View style={styles.replyActions}>
+                      <TouchableOpacity 
+                          onPress={() => setShowReplyInput(false)}
+                          style={styles.cancelButton}
+                        >
+                          <Text style={{color: '#fff', fontSize: 14, fontWeight: '500'}}>Hủy</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[
+                          styles.button, 
+                          styles.primaryButton,
+                          (!commentContent?.trim() || isCreatingComment) && styles.disabledButton
+                        ]}
+                        onPress={handleReplySubmit}
+                        disabled={!commentContent?.trim() || isCreatingComment}
+                      >
+                        {isCreatingComment && (
+                          <ActivityIndicator color="#fff" style={{ marginRight: 8 }} />
+                        )}
+                        <Text style={styles.buttonText}>
+                          Bình luận
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
                 )}
+              </View>
+
+
+            {/* Comments */}
+            <View style={{marginTop: 24}}>
+              <Text style={styles.commentCount}>{data?.commentCount} bình luận</Text>
+              {comments.length > 0 && (
+                <DetailComments comments={comments} />
+              )}
               </View>
             </ScrollView>
           ) : (
@@ -221,23 +339,66 @@ const QuestionDetailModal: React.FC<QuestionDetailModalProps> = ({ visible, onCl
           )}
         </View>
       </View>
-    {/* Edit Modal */}
-    {data && (
-      <EditQuestionModal
-        visible={editModalVisible}
-        onClose={() => setEditModalVisible(false)}
-        questionId={data.id}
-        initialTitle={data.title}
-        initialContent={data.content}
-        lessonMaterialId={data.lessonMaterialId}
-      />
-    )}
-    <Toast/>
-  </Modal>
+
+      {/* Edit Modal */}
+      {data && (
+        <EditQuestionModal
+          visible={editModalVisible}
+          onClose={() => setEditModalVisible(false)}
+          questionId={data.id}
+          initialTitle={data.title}
+          initialContent={data.content}
+          lessonMaterialId={data.lessonMaterialId}
+        />
+      )}
+      <Toast />
+    </Modal>
   );
 };
 
 const styles = StyleSheet.create({
+  menuContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    margin: 4,
+  },
+  lastModifiedText: {
+    color: '#4e586b',
+    fontSize: 14,
+    marginRight: 12,
+  },
+  menuWrapper: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    zIndex: 999, // High z-index for the menu wrapper
+  },
+  menuOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'transparent',
+    zIndex: 998,
+  },
+  menu: {
+    position: 'absolute',
+    bottom: 30, // Position below the menu button
+    right: 0,
+    backgroundColor: '#3b4554',
+    borderRadius: 10,
+    minWidth: 150,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    zIndex: 1001, // Highest z-index for the menu itself
+    overflow: 'hidden',
+  },
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.7)',
@@ -256,7 +417,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between', // center children horizontally
-    marginBottom: 12,
+    marginBottom: 0,
     position: 'relative',
   },
   backBtn: {
@@ -301,10 +462,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     justifyContent: 'space-between',
-    marginBottom: 16,
   },
   questionOwnerInfo: {
-    marginVertical: 16,
+    marginTop: 16,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
@@ -319,6 +479,116 @@ const styles = StyleSheet.create({
     color: '#808b9a',
     fontSize: 14,
   },
+  expandBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    backgroundColor: '#181818',
+    borderTopWidth: 1,
+    borderTopColor: '#333',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 2,
+  },
+  expandBtnText: {
+    color: '#1d9ffb',
+    marginLeft: 8,
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  commentCount: {
+    fontSize: 18,
+    color: '#dae4f0',
+    fontWeight: '700',
+    marginBottom: 16,
+  },
+  commentInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    marginTop: 8
+  },
+  avatar: {
+    width: 40, 
+    height: 40, 
+    borderRadius: 20, 
+    objectFit: 'cover'
+  },
+  addCommentButton: {
+    flex: 1,
+    padding: 8,
+    borderRadius: 10,
+    justifyContent: 'center',
+    height: 40,
+    backgroundColor: '#323c4a',
+  },
+  addCommentText: {
+    color: '#808b9a',
+    marginLeft: 8
+  },
+  replyInputContainer: {
+    flex: 1,
+    marginBottom: 12,
+    flexShrink: 1,
+  },
+  replyEditor: {
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  replyEditorContent: {
+    minHeight: 120,
+  },
+  editContainer: {
+    marginTop: 8,
+    marginBottom: 12,
+  },
+  replyActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 8,
+  },
+  button: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 80,
+    flexDirection: 'row',
+    gap: 8,
+  },
+  cancelButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#3e4a56',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 80,
+    flexDirection: 'row',
+    gap: 8,
+  },
+  primaryButton: {
+    backgroundColor: '#1d9ffb',
+  },
+  disabledButton: {
+    opacity: 0.5,
+  },
+  replyButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '500',
+  }
 });
 
 export default QuestionDetailModal;

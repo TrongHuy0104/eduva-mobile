@@ -403,6 +403,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 12,
     padding: 10,
     fontSize: 16,
+    paddingBottom: 0,
     borderWidth: 0,
   },
   imagePreviewRow: {

@@ -5,6 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { RichEditor, RichToolbar, actions } from 'react-native-pell-rich-editor';
+import Toast from "react-native-toast-message";
 import GradientButton from "../GradientButton";
 
 interface EditQuestionModalProps {
@@ -318,6 +319,7 @@ const EditQuestionModal: React.FC<EditQuestionModalProps> = ({ visible, onClose,
             </View>
           </View>
         </Modal>
+        <Toast/>
       </Modal>
     );
   };
@@ -433,6 +435,7 @@ const EditQuestionModal: React.FC<EditQuestionModalProps> = ({ visible, onClose,
       borderBottomRightRadius: 12,
       padding: 10,
       fontSize: 16,
+      paddingBottom: 0,
       borderWidth: 0,
     },
     imagePreviewRow: {
