@@ -321,4 +321,6 @@ const styles = StyleSheet.create({
   },
 });
 
+RichTextEditor.displayName = 'RichTextEditor';
+
 export default RichTextEditor;

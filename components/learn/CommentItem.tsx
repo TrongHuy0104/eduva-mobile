@@ -1,5 +1,6 @@
 import { useAuth } from "@/contexts/auth.context";
 import { useCreateComment, useDeleteComment, useUpdateComment } from "@/hooks/useComment";
+import { useToast } from "@/hooks/useToast";
 import { CommentEntity, Reply } from "@/types/models/comment.model";
 import { CreateCommentRequest } from "@/types/requests/create-comment-request.model";
 import { UpdateCommentRequest } from "@/types/requests/update-comment-request.model";
@@ -42,14 +43,21 @@ export default function CommentItem({
     const { mutate: createCommentMutation, isPending: isCreatingComment } = useCreateComment();
     const { mutate: updateCommentMutation, isPending: isUpdatingComment } = useUpdateComment();
     const { user } = useAuth();
+    const toast = useToast();
     
     const width = useWindowDimensions().width;
 
     const handleDeleteComment = () => {
-        deleteCommentMutation(data.id);
+        deleteCommentMutation(data.id, {
+            onSuccess: () => {
+                toast.success('Xóa bình luận thành công', 'Bình luận của bạn đã được xóa thành công');
+            },
+        });
     }
 
     const handleReplySubmit = async () => {
+      console.log(111);
+      
         if (!richTextEditorRef.current) return;
         
         const content = richTextEditorRef.current.getContent();
@@ -66,6 +74,7 @@ export default function CommentItem({
             onSuccess: () => {
               richTextEditorRef.current?.setContent('');
               setShowReplyInput(false);
+              toast.success('Tạo bình luận thành công', 'Bình luận của bạn đã được tạo thành công');
             },
           });
         } catch (error) {
