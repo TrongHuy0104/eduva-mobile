@@ -113,6 +113,7 @@ const AudioListener = (
     };
 
     const handleSeekComplete = async (value: number) => {
+        const wasPlaying = isPlaying;
         setIsUserSeeking(false);
         setSeekValue(null);
         if (sound) {
@@ -120,6 +121,11 @@ const AudioListener = (
             await sound.setPositionAsync(value * 1000);
             setPosition(value);
             isSeeking.current = false;
+            
+            // Resume playback if it was playing before seeking
+            if (wasPlaying) {
+                await sound.playAsync();
+            }
         }
     };
 
@@ -161,9 +167,6 @@ const AudioListener = (
         return () => {
             if (debounceVolumeRef.current) {
                 clearTimeout(debounceVolumeRef.current);
-            }
-            if (sound && isPlaying) {
-                sound.pauseAsync();
             }
         };
     }, [sound, isPlaying]);

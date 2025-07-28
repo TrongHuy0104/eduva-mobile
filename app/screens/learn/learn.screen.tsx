@@ -1,4 +1,5 @@
 import AudioListener from '@/components/learn/AudioListener';
+import CommentModal from '@/components/learn/CommentModal';
 import DocViewer from '@/components/learn/DocViewer';
 import Footer from '@/components/learn/Footer';
 import LessonSidebar from '@/components/learn/LessonSidebar';
@@ -6,6 +7,7 @@ import PdfViewer from '@/components/learn/PdfViewer';
 import VideoViewer from '@/components/learn/VideoViewer';
 import { useLessonData } from '@/contexts/lesson-data.context';
 import { useSearch } from '@/contexts/search.context';
+import { useLastMaterialTracking } from '@/hooks/useLastMaterialTracking';
 import {
     useAllFoldersAndLessonMaterials,
     useLessonMaterialById,
@@ -25,6 +27,7 @@ interface LearnScreenProps {
 const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
     const { data: material } = useLessonMaterialById(materialId);
     const [sidebarVisible, setSidebarVisible] = useState(false);
+    const [commentVisible, setCommentVisible] = useState(false);
     const videoRef = useRef<any>(null);
     const audioRef = useRef<any>(null);
     const isFocused = useIsFocused();
@@ -32,6 +35,7 @@ const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
     const { data: foldersAndLessonMaterials } =
         useAllFoldersAndLessonMaterials(classId);
     const { setFolders, folders } = useLessonData();
+    const { setLastLesson } = useLastMaterialTracking();
     const {
         searchResults,
         isSearchActive,
@@ -69,9 +73,10 @@ const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isSearchActive, currentIndex]);
 
-    const goToMaterial = (index: number) => {
+    const goToMaterial = async (index: number) => {
         if (index < 0 || index >= allMaterials.length) return;
         const { material, folder } = allMaterials[index];
+        await setLastLesson(classId, folder.id, material.id);
         router.push(
             `/learn/${material.id}?classId=${classId}&folderId=${folder.id}`
         );
@@ -94,11 +99,6 @@ const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
 
     // Clear search state when switching class
     // clearSearch, prevClassId, setPrevClassId already destructured above
-    console.log('prevClassId:', prevClassId);
-    console.log('classId:', classId);
-    console.log('prevClassIdIsString:', typeof prevClassId === 'string' && prevClassId.length > 0);
-    console.log('classIdIsString:', typeof classId === 'string' && classId.length > 0);
-    console.log('prevClassId !== classId:', prevClassId !== classId);
     useEffect(() => {
         const isValidId = (id: any) =>
             typeof id === 'string' &&
@@ -225,6 +225,7 @@ const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
 
             <Footer
                 onSidebarOpen={() => setSidebarVisible(true)}
+                onCommentOpen={() => setCommentVisible(true)}
                 onPrev={handlePrev}
                 onNext={handleNext}
                 disablePrev={currentIndex <= 0}
@@ -237,6 +238,13 @@ const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
                 visible={sidebarVisible}
                 onClose={() => setSidebarVisible(false)}
             />
+            <CommentModal
+                visible={commentVisible}
+                onClose={() => setCommentVisible(false)}
+                materialTitle={material?.title!}
+                materialId={material?.id!}
+            />
+            
         </View>
     );
 };

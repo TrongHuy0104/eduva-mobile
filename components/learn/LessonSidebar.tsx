@@ -5,6 +5,7 @@ import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import {
     Animated,
+    BackHandler,
     Dimensions,
     Modal,
     Pressable,
@@ -19,15 +20,49 @@ import Folder from './Folder';
 interface LessonSidebarProps {
     visible: boolean;
     onClose: () => void;
-    // folders: FoldersLessonMaterialsResponse[];
 }
 
 const { width } = Dimensions.get('window');
 
-const LessonSidebar: React.FC<LessonSidebarProps> = ({ visible, onClose }) => {
-    const [slideAnim] = React.useState(new Animated.Value(width));
+interface SidebarMethods {
+    show: () => void;
+    hide: (callback?: () => void) => void;
+    toggle: () => void;
+}
+
+const LessonSidebar = React.forwardRef<SidebarMethods, LessonSidebarProps>(({ visible: propVisible, onClose }, ref) => {
+    const [isVisible, setIsVisible] = React.useState(false);
+    const slideAnim = React.useRef(new Animated.Value(width)).current;
     const { folderId } = useLocalSearchParams();
     const { folders } = useLessonData();
+    const isMounted = React.useRef(true);
+
+    // Expose methods via ref
+    React.useImperativeHandle(ref, () => ({
+        show: () => {
+            if (!isMounted.current) return;
+            showSidebar();
+        },
+        hide: (callback?: () => void) => {
+            if (!isMounted.current) return;
+            hideSidebar(callback);
+        },
+        toggle: () => {
+            if (!isMounted.current) return;
+            if (isVisible) {
+                hideSidebar();
+            } else {
+                showSidebar();
+            }
+        },
+    }));
+
+    // Cleanup on unmount
+    React.useEffect(() => {
+        return () => {
+            isMounted.current = false;
+        };
+    }, []);
     const {
         searchTerm,
         setSearchTerm,
@@ -37,6 +72,26 @@ const LessonSidebar: React.FC<LessonSidebarProps> = ({ visible, onClose }) => {
         setIsSearchActive,
         clearSearch,
     } = useSearch();
+
+    const showSidebar = React.useCallback(() => {
+        setIsVisible(true);
+        Animated.timing(slideAnim, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+        }).start();
+    }, [slideAnim]);
+
+    const hideSidebar = React.useCallback((callback?: () => void) => {
+        Animated.timing(slideAnim, {
+            toValue: width,
+            duration: 300,
+            useNativeDriver: true,
+        }).start(() => {
+            setIsVisible(false);
+            if (callback) callback();
+        });
+    }, [slideAnim]);
 
     // Filter folders and materials by search term
     const filteredFolders = React.useMemo(() => {
@@ -85,30 +140,43 @@ const LessonSidebar: React.FC<LessonSidebarProps> = ({ visible, onClose }) => {
         setIsSearchActive(true);
     }, [searchTerm, folders]);
 
+    // Handle external visibility changes
     React.useEffect(() => {
-        if (visible) {
-            Animated.timing(slideAnim, {
-                toValue: 0,
-                duration: 300,
-                useNativeDriver: true,
-            }).start();
+        if (!isMounted.current) return;
+        
+        if (propVisible) {
+            showSidebar();
         } else {
-            Animated.timing(slideAnim, {
-                toValue: width,
-                duration: 300,
-                useNativeDriver: true,
-            }).start();
+            hideSidebar();
         }
-    }, [visible, slideAnim]);
+    }, [propVisible, showSidebar, hideSidebar]);
+
+    // Handle back button press on Android
+    React.useEffect(() => {
+        const backAction = () => {
+            if (isVisible) {
+                hideSidebar(onClose);
+                return true;
+            }
+            return false;
+        };
+
+        const backHandler = BackHandler.addEventListener(
+            'hardwareBackPress',
+            backAction
+        );
+
+        return () => backHandler.remove();
+    }, [isVisible, onClose, hideSidebar]);
 
     return (
         <Modal
-            visible={visible}
+            visible={isVisible}
             transparent
             animationType="none"
-            onRequestClose={onClose}
+            onRequestClose={() => hideSidebar(onClose)}
         >
-            <TouchableWithoutFeedback onPress={onClose}>
+            <TouchableWithoutFeedback onPress={() => hideSidebar(onClose)}>
                 <View style={styles.overlay} />
             </TouchableWithoutFeedback>
             <Animated.View
@@ -221,7 +289,10 @@ const LessonSidebar: React.FC<LessonSidebarProps> = ({ visible, onClose }) => {
             </Animated.View>
         </Modal>
     );
-};
+});
+
+// Add display name for debugging
+LessonSidebar.displayName = 'LessonSidebar';
 
 const styles = StyleSheet.create({
     overlay: {
@@ -284,5 +355,7 @@ const styles = StyleSheet.create({
         textAlignVertical: 'center',
     },
 });
+
+LessonSidebar.displayName = 'LessonSidebar';
 
 export default LessonSidebar;

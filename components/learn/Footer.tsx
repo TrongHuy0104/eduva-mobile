@@ -7,6 +7,7 @@ import { GradientButton } from '../GradientButton';
 
 interface FooterProps {
     onSidebarOpen?: () => void;
+    onCommentOpen?: () => void;
     onPrev?: () => void;
     onNext?: () => void;
     disablePrev?: boolean;
@@ -15,6 +16,7 @@ interface FooterProps {
 
 const Footer = ({
     onSidebarOpen,
+    onCommentOpen,
     onPrev,
     onNext,
     disablePrev,
@@ -29,6 +31,7 @@ const Footer = ({
                     styles.commentBtn,
                     { backgroundColor: pressed ? '#2e4a8d' : '#292d35' },
                 ]}
+                onPress={onCommentOpen}
             >
                 <Image
                     style={{

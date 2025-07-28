@@ -1,4 +1,3 @@
-import { useSearch } from '@/contexts/search.context';
 import { useLastMaterialTracking } from '@/hooks/useLastMaterialTracking';
 import { ContentType } from '@/types/enums/lesson-material.enum';
 import { LessonMaterial } from '@/types/models/lesson-material.model';
@@ -30,7 +29,6 @@ const Material = ({
     const { setLastLesson } = useLastMaterialTracking();
     const { id: materialId, folderId, classId } = useLocalSearchParams();
     const [isRedirecting, setIsRedirecting] = useState(false);
-    const { searchTerm, isSearchActive } = useSearch();
 
     const getIcon = () => {
         if (material.contentType === ContentType.DOCX) {
@@ -103,7 +101,6 @@ const Material = ({
                     style={[
                         styles.materialTitle,
                         isActive && { color: '#FFD700' },
-                        isSearchActive && { color: '#fff' },
                     ]}
                 >
                     {`${folderIndex + 1}.${index + 1} ${material.title}`}

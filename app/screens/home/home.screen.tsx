@@ -25,8 +25,10 @@ const HomeScreen = () => {
 
     let subjectsRowContent;
     if (isLoadingClasses) {
-        subjectsRowContent = Array.from({ length: 6 }).map((_, idx) => (
-            <View style={styles.subjectCol} key={idx}>
+        // Generate unique IDs for skeleton items
+        const skeletonIds = Array.from({ length: 6 }, (_, i) => `skeleton-${i}-${Date.now()}`);
+        subjectsRowContent = skeletonIds.map((id) => (
+            <View style={styles.subjectCol} key={id}>
                 <SubjectCardSkeleton />
             </View>
         ));

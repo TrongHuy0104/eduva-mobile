@@ -154,27 +154,28 @@ const ClassScreen = ({ classId }: { classId: string }) => {
                         ))}
                     </ScrollView>
                     <Pressable
-                        style={({ pressed }) => [
-                            {
-                                width: '100%',
-                                position: 'fixed',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                backgroundColor: '#0093fc',
-                                borderRadius: 999,
-                                height: 40,
-                                paddingHorizontal: 10,
-                                marginBottom: 12,
-                            },
-                            {
-                                opacity:
-                                    pressed && !isRedirecting
-                                        ? 0.7
-                                        : isRedirecting
-                                        ? 0.5
-                                        : 1,
-                            },
-                        ]}
+                        style={({ pressed }) => {
+                            const getButtonOpacity = () => {
+                                if (pressed && !isRedirecting) return 0.7;
+                                if (isRedirecting) return 0.5;
+                                return 1;
+                            };
+
+                            return [
+                                {
+                                    width: '100%',
+                                    position: 'fixed',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    backgroundColor: '#0093fc',
+                                    borderRadius: 999,
+                                    height: 40,
+                                    paddingHorizontal: 10,
+                                    marginBottom: 12,
+                                },
+                                { opacity: getButtonOpacity() },
+                            ];
+                        }}
                         onPress={redirect}
                         disabled={isRedirecting}
                     >
