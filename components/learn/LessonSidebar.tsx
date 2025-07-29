@@ -9,6 +9,7 @@ import {
     Dimensions,
     Modal,
     Pressable,
+    ScrollView,
     StyleSheet,
     Text,
     TextInput,
@@ -245,7 +246,7 @@ const LessonSidebar = React.forwardRef<SidebarMethods, LessonSidebarProps>(({ vi
 
                     </View>
                 {/* Folders */}
-                <View
+                <ScrollView
                     style={{ overflowY: 'auto', overscrollBehavior: 'contain' }}
                 >
                     {filteredFolders.length === 0 ? (
@@ -285,7 +286,7 @@ const LessonSidebar = React.forwardRef<SidebarMethods, LessonSidebarProps>(({ vi
                             })}
                         </>
                     )}
-                </View>
+                </ScrollView>
             </Animated.View>
         </Modal>
     );
