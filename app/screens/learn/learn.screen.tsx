@@ -25,9 +25,10 @@ interface LearnScreenProps {
 }
 
 const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
-    const { data: material } = useLessonMaterialById(materialId);
+    const { data: material, isPending: isLoadingMaterial } = useLessonMaterialById(materialId);
     const [sidebarVisible, setSidebarVisible] = useState(false);
     const [commentVisible, setCommentVisible] = useState(false);
+    const [isNavigating, setIsNavigating] = useState(false);
     const videoRef = useRef<any>(null);
     const audioRef = useRef<any>(null);
     const isFocused = useIsFocused();
@@ -74,12 +75,20 @@ const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
     }, [isSearchActive, currentIndex]);
 
     const goToMaterial = async (index: number) => {
-        if (index < 0 || index >= allMaterials.length) return;
-        const { material, folder } = allMaterials[index];
-        await setLastLesson(classId, folder.id, material.id);
-        router.push(
-            `/learn/${material.id}?classId=${classId}&folderId=${folder.id}`
-        );
+        if (index < 0 || index >= allMaterials.length || isNavigating) return;
+        
+        try {
+            setIsNavigating(true);
+            const { material, folder } = allMaterials[index];
+            await setLastLesson(classId, folder.id, material.id);
+            await router.push(
+                `/learn/${material.id}?classId=${classId}&folderId=${folder.id}`
+            );
+        } catch (error) {
+            console.error('Error navigating to material:', error);
+        } finally {
+            setIsNavigating(false);
+        }
     };
 
     const handlePrev = () => {
@@ -228,11 +237,8 @@ const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
                 onCommentOpen={() => setCommentVisible(true)}
                 onPrev={handlePrev}
                 onNext={handleNext}
-                disablePrev={currentIndex <= 0}
-                disableNext={
-                    currentIndex === allMaterials.length - 1 ||
-                    allMaterials.length === 0
-                }
+                disablePrev={currentIndex <= 0 || isNavigating || isLoadingMaterial}
+                disableNext={currentIndex >= allMaterials.length - 1 || isNavigating || isLoadingMaterial}
             />
             <LessonSidebar
                 visible={sidebarVisible}
@@ -244,7 +250,6 @@ const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
                 materialTitle={material?.title!}
                 materialId={material?.id!}
             />
-            
         </View>
     );
 };

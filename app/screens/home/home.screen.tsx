@@ -5,17 +5,25 @@ import SubjectCardSkeleton from '@/components/skeleton/ClassCardSkeleton';
 import { windowHeight } from '@/constants/app.constants';
 import { useAuth } from '@/contexts/auth.context';
 import { useModal } from '@/contexts/modal.context';
+import { useSearch } from '@/contexts/search.context';
 import { useClass } from '@/hooks/useClass';
 import { ClassModel } from '@/types/models/class.model';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 const HomeScreen = () => {
     const { user } = useAuth();
     const { openModal } = useModal();
+    const { searchTerm, clearSearch } = useSearch();
+
+    useEffect(() => {
+        if (searchTerm) {
+            clearSearch();
+        }
+    }, [searchTerm]);
 
     const {
         data: classes,
