@@ -24,42 +24,42 @@ const BANNERS: Banner[] = [
     {
         id: 'banner-1',
         style: ['#2c8cbc', '#58c8c7'],
-        title: 'Lớp Offline tại Hà Nội 👑',
+        title: 'Tham gia lớp học dễ dàng 👑',
         description:
-            'Hình thức học Offline phù hợp nếu bạn muốn được hướng dẫn và hỗ trợ trực tiếp tại lớp. Giờ học linh hoạt, phù hợp cả sinh viên và người đi làm.',
-        buttonContent: 'Tư vấn miễn phí',
+            'Chỉ cần nhập mã lớp do giáo viên cung cấp, bạn sẽ nhanh chóng được kết nối với lớp học của mình. Không cần thao tác phức tạp, mọi thứ được thiết kế để bạn có thể bắt đầu học ngay lập tức.',
+        buttonContent: 'Tham gia ngay',
     },
     {
         id: 'banner-2',
         style: ['#8a0aff', '#6006ff'],
-        title: 'Mở bán khóa JavaScript Pro',
+        title: 'Tài liệu học tập mọi lúc mọi nơi',
         description:
-            'Từ 08/08/2024 khóa học sẽ có giá 1.399k. Khi khóa học hoàn thiện sẽ trở về giá gốc.',
-        buttonContent: 'Học thử miễn phí',
+            'Truy cập và học bài trên mọi thiết bị, bất cứ khi nào bạn muốn. Dù ở nhà, ở trường hay đang di chuyển, bạn vẫn có thể tiếp tục bài học, ôn tập kiến thức và luyện tập kỹ năng mà không bị gián đoạn.',
+        buttonContent: 'Bắt đầu học',
     },
     {
         id: 'banner-3',
         style: ['#6828fa', '#ffbaa4'],
-        title: 'Học HTML CSS cho người mới',
+        title: 'Hỏi đáp ngay trong bài học',
         description:
-            'Thực hành dự án với Figma, hàng trăm bài tập, hướng dẫn 100% bởi Sơn Đặng, tặng kèm Flashcards, v.v.',
-        buttonContent: 'Học thử miễn phí',
+            'Nếu gặp chỗ chưa hiểu, bạn có thể đặt câu hỏi ngay trong bài học và nhận được lời giải thích chi tiết từ giáo viên cũng như góp ý từ các bạn học khác. Tương tác nhanh chóng, học tập hiệu quả hơn.',
+        buttonContent: 'Đặt câu hỏi',
     },
     {
         id: 'banner-4',
         style: ['#2877fa', '#6717cd'],
-        title: 'Học ReactJS Miễn Phí!',
+        title: 'Kết nối với giáo viên và bạn học',
         description:
-            'Khóa học ReactJS từ cơ bản tới nâng cao. Kết quả của khóa học này là bạn có thể làm hầu hết các dự án thường gặp với ReactJS.',
-        buttonContent: 'Đăng ký ngay',
+            'Học tập, trao đổi và chia sẻ kinh nghiệm trực tiếp trên Eduva. Tăng cường kết nối với giáo viên và bạn học để cùng nhau tiến bộ mỗi ngày.',
+        buttonContent: 'Kết nối ngay',
     },
     {
         id: 'banner-5',
         style: ['#7612ff', '#05b2ff'],
-        title: 'Thành Quả của Học Viên',
+        title: 'Học tập hiệu quả hơn',
         description:
-            'Để đạt được kết quả tốt trong mọi việc ta cần xác định mục tiêu rõ ràng cho việc đó. Học lập trình cũng không là ngoại lệ.',
-        buttonContent: 'Xem thành quả',
+            'Giao diện đơn giản, dễ sử dụng, giúp bạn tập trung hơn và đạt được mục tiêu học tập nhanh chóng. Tối ưu trải nghiệm để bạn học ít mà hiệu quả nhiều.',
+        buttonContent: 'Trải nghiệm ngay',
     },
 ];
 
