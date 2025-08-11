@@ -14,7 +14,6 @@ interface MaterialProps {
     onClose: () => void;
     isActive?: boolean;
     folder: FoldersLessonMaterialsResponse;
-
 }
 
 const Material = ({
@@ -24,7 +23,6 @@ const Material = ({
     onClose,
     folder,
     isActive,
-
 }: MaterialProps) => {
     const { setLastLesson } = useLastMaterialTracking();
     const { id: materialId, folderId, classId } = useLocalSearchParams();
@@ -38,7 +36,8 @@ const Material = ({
         } else if (material.contentType === ContentType.Audio) {
             return 'volume-high';
         } else if (material.contentType === ContentType.Video) {
-            return 'circle-play';        }
+            return 'circle-play';
+        }
     };
 
     const formatSeconds = (seconds: number) => {
@@ -134,6 +133,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '500',
         color: '#ffffffe6',
+        paddingRight: 10,
     },
     materialTime: {
         fontSize: 14,
