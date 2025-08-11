@@ -43,24 +43,29 @@ const ClassScreen = ({ classId }: { classId: string }) => {
             } else {
                 const lastLesson = await getLastLesson(classId);
 
-                if (lastLesson) {
-                    router.replace(
-                        // @ts-ignore
-                        `/learn/${lastLesson.material}?classId=${classId}&folderId=${lastLesson.folder}`
+                if (lastLesson && foldersAndLessonMaterials) {
+                    const findFolder = foldersAndLessonMaterials.find(
+                        (folder) => folder.id === lastLesson.folder
                     );
+
+                    if (findFolder) {
+                        const findLesson = findFolder.lessonMaterials.find(
+                            (lesson) => lesson.id === lastLesson.material
+                        );
+
+                        if (findLesson) {
+                            router.replace(
+                                // @ts-ignore
+                                `/learn/${findLesson.id}?classId=${classId}&folderId=${findFolder.id}`
+                            );
+                        } else {
+                            return redirectToTheFirstLesson();
+                        }
+                    } else {
+                        return redirectToTheFirstLesson();
+                    }
                 } else {
-                    if (!foldersAndLessonMaterials) return;
-
-                    const folderHasLesson = foldersAndLessonMaterials.find(
-                        (folder) => folder.countLessonMaterials > 0
-                    );
-
-                    if (!folderHasLesson) return;
-
-                    router.replace(
-                        // @ts-ignore
-                        `/learn/${folderHasLesson.lessonMaterials[0].id}?classId=${classId}&folderId=${folderHasLesson.id}`
-                    );
+                    redirectToTheFirstLesson();
                 }
             }
         } finally {
@@ -69,6 +74,21 @@ const ClassScreen = ({ classId }: { classId: string }) => {
                 setIsRedirecting(false);
             }, 1000);
         }
+    };
+
+    const redirectToTheFirstLesson = () => {
+        if (!foldersAndLessonMaterials) return;
+
+        const folderHasLesson = foldersAndLessonMaterials.find(
+            (folder) => folder.countLessonMaterials > 0
+        );
+
+        if (!folderHasLesson) return;
+
+        router.replace(
+            // @ts-ignore
+            `/learn/${folderHasLesson.lessonMaterials[0].id}?classId=${classId}&folderId=${folderHasLesson.id}`
+        );
     };
 
     const getTotalDurationFormatted = (): string => {
