@@ -25,7 +25,8 @@ interface LearnScreenProps {
 }
 
 const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
-    const { data: material, isPending: isLoadingMaterial } = useLessonMaterialById(materialId);
+    const { data: material, isPending: isLoadingMaterial } =
+        useLessonMaterialById(materialId);
     const [sidebarVisible, setSidebarVisible] = useState(false);
     const [commentVisible, setCommentVisible] = useState(false);
     const [isNavigating, setIsNavigating] = useState(false);
@@ -44,14 +45,14 @@ const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
         setCurrentSearchIndex,
         clearSearch,
         prevClassId,
-        setPrevClassId
+        setPrevClassId,
     } = useSearch();
     // Use search results if search is active, otherwise use all materials
     const allMaterials: { material: any; folder: any }[] = React.useMemo(() => {
         if (isSearchActive && searchResults.length > 0) {
             return searchResults;
         }
-        
+
         const arr: { material: any; folder: any }[] = [];
         folders.forEach((folder) => {
             folder.lessonMaterials?.forEach((material) => {
@@ -68,7 +69,11 @@ const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
 
     // Update search index only when search is active and materialId changes
     React.useEffect(() => {
-        if (isSearchActive && currentIndex !== -1 && currentIndex !== currentSearchIndex) {
+        if (
+            isSearchActive &&
+            currentIndex !== -1 &&
+            currentIndex !== currentSearchIndex
+        ) {
             setCurrentSearchIndex(currentIndex);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -76,7 +81,7 @@ const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
 
     const goToMaterial = async (index: number) => {
         if (index < 0 || index >= allMaterials.length || isNavigating) return;
-        
+
         try {
             setIsNavigating(true);
             const { material, folder } = allMaterials[index];
@@ -120,11 +125,7 @@ const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
         const prevClassIdValid = isValidId(prevClassId);
         const classIdValid = isValidId(classId);
 
-        if (
-            prevClassIdValid &&
-            classIdValid &&
-            prevClassId !== classId
-        ) {
+        if (prevClassIdValid && classIdValid && prevClassId !== classId) {
             clearSearch();
         }
         if (classIdValid) {
@@ -226,9 +227,7 @@ const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
                             material?.lastModifiedAt ?? material?.createdAt
                         )}
                     </Text>
-                    <Text style={styles.description}>
-                        {material?.description}
-                    </Text>
+                    <Text style={styles.description}></Text>
                 </View>
             </ScrollView>
 
@@ -237,8 +236,14 @@ const LearnScreen = ({ classId, folderId, materialId }: LearnScreenProps) => {
                 onCommentOpen={() => setCommentVisible(true)}
                 onPrev={handlePrev}
                 onNext={handleNext}
-                disablePrev={currentIndex <= 0 || isNavigating || isLoadingMaterial}
-                disableNext={currentIndex >= allMaterials.length - 1 || isNavigating || isLoadingMaterial}
+                disablePrev={
+                    currentIndex <= 0 || isNavigating || isLoadingMaterial
+                }
+                disableNext={
+                    currentIndex >= allMaterials.length - 1 ||
+                    isNavigating ||
+                    isLoadingMaterial
+                }
             />
             <LessonSidebar
                 visible={sidebarVisible}
