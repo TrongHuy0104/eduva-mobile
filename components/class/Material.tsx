@@ -1,3 +1,4 @@
+import { windowWidth } from '@/constants/app.constants';
 import { useLastMaterialTracking } from '@/hooks/useLastMaterialTracking';
 import { ContentType } from '@/types/enums/lesson-material.enum';
 import { LessonMaterial } from '@/types/models/lesson-material.model';
@@ -27,7 +28,7 @@ const Material = ({ material, classId, index, folderId }: MaterialProps) => {
 
     const redirect = async () => {
         if (isRedirecting) return; // Prevent multiple redirects
-        
+
         try {
             setIsRedirecting(true);
             await setLastLesson(classId, folderId, material.id);
@@ -59,7 +60,7 @@ const Material = ({ material, classId, index, folderId }: MaterialProps) => {
             style={({ pressed }) => [
                 pressed && !isRedirecting && styles.buttonPressed,
                 styles.materialItem,
-                isRedirecting && styles.disabled
+                isRedirecting && styles.disabled,
             ]}
             onPress={redirect}
             disabled={isRedirecting}
@@ -109,7 +110,7 @@ const styles = StyleSheet.create({
     materialTitle: {
         fontSize: 15,
         color: '#242424',
-        maxWidth: 260,
+        maxWidth: windowWidth(260),
     },
     buttonPressed: {
         backgroundColor: '#f0f9ff',
