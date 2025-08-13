@@ -13,6 +13,7 @@ import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import React, { useEffect } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 
 const HomeScreen = () => {
     const { user } = useAuth();
@@ -23,7 +24,7 @@ const HomeScreen = () => {
         if (searchTerm) {
             clearSearch();
         }
-    }, [searchTerm]);
+    }, [searchTerm, clearSearch]);
 
     const {
         data: classes,
@@ -34,7 +35,10 @@ const HomeScreen = () => {
     let subjectsRowContent;
     if (isLoadingClasses) {
         // Generate unique IDs for skeleton items
-        const skeletonIds = Array.from({ length: 6 }, (_, i) => `skeleton-${i}-${Date.now()}`);
+        const skeletonIds = Array.from(
+            { length: 6 },
+            (_, i) => `skeleton-${i}-${Date.now()}`
+        );
         subjectsRowContent = skeletonIds.map((id) => (
             <View style={styles.subjectCol} key={id}>
                 <SubjectCardSkeleton />
@@ -110,6 +114,7 @@ const HomeScreen = () => {
                         </Text>
                     </View>
                 </Pressable>
+                <Toast />
             </View>
         );
     }

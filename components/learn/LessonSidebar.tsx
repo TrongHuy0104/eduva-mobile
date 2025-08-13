@@ -14,7 +14,7 @@ import {
     Text,
     TextInput,
     TouchableWithoutFeedback,
-    View
+    View,
 } from 'react-native';
 import Folder from './Folder';
 
@@ -31,266 +31,308 @@ interface SidebarMethods {
     toggle: () => void;
 }
 
-const LessonSidebar = React.forwardRef<SidebarMethods, LessonSidebarProps>(({ visible: propVisible, onClose }, ref) => {
-    const [isVisible, setIsVisible] = React.useState(false);
-    const slideAnim = React.useRef(new Animated.Value(width)).current;
-    const { folderId } = useLocalSearchParams();
-    const { folders } = useLessonData();
-    const isMounted = React.useRef(true);
+const LessonSidebar = React.forwardRef<SidebarMethods, LessonSidebarProps>(
+    ({ visible: propVisible, onClose }, ref) => {
+        const [isVisible, setIsVisible] = React.useState(false);
+        const slideAnim = React.useRef(new Animated.Value(width)).current;
+        const { folderId } = useLocalSearchParams();
+        const { folders } = useLessonData();
+        const isMounted = React.useRef(true);
 
-    // Expose methods via ref
-    React.useImperativeHandle(ref, () => ({
-        show: () => {
-            if (!isMounted.current) return;
-            showSidebar();
-        },
-        hide: (callback?: () => void) => {
-            if (!isMounted.current) return;
-            hideSidebar(callback);
-        },
-        toggle: () => {
-            if (!isMounted.current) return;
-            if (isVisible) {
-                hideSidebar();
-            } else {
+        // Expose methods via ref
+        React.useImperativeHandle(ref, () => ({
+            show: () => {
+                if (!isMounted.current) return;
                 showSidebar();
-            }
-        },
-    }));
-
-    // Cleanup on unmount
-    React.useEffect(() => {
-        return () => {
-            isMounted.current = false;
-        };
-    }, []);
-    const {
-        searchTerm,
-        setSearchTerm,
-        searchResults,
-        setSearchResults,
-        isSearchActive,
-        setIsSearchActive,
-        clearSearch,
-    } = useSearch();
-
-    const showSidebar = React.useCallback(() => {
-        setIsVisible(true);
-        Animated.timing(slideAnim, {
-            toValue: 0,
-            duration: 300,
-            useNativeDriver: true,
-        }).start();
-    }, [slideAnim]);
-
-    const hideSidebar = React.useCallback((callback?: () => void) => {
-        Animated.timing(slideAnim, {
-            toValue: width,
-            duration: 300,
-            useNativeDriver: true,
-        }).start(() => {
-            setIsVisible(false);
-            if (callback) callback();
-        });
-    }, [slideAnim]);
-
-    // Filter folders and materials by search term
-    const filteredFolders = React.useMemo(() => {
-        if (!searchTerm.trim()) {
-            return folders;
-        }
-
-        const lowerSearch = searchTerm.toLowerCase();
-        return folders
-            .map((folder) => {
-                const filteredMaterials = folder.lessonMaterials?.filter(
-                    (material) => material.title.toLowerCase().includes(lowerSearch)
-                );
-                if (filteredMaterials && filteredMaterials.length > 0) {
-                    return {
-                        ...folder,
-                        lessonMaterials: filteredMaterials,
-                        countLessonMaterials: filteredMaterials.length,
-                    };
+            },
+            hide: (callback?: () => void) => {
+                if (!isMounted.current) return;
+                hideSidebar(callback);
+            },
+            toggle: () => {
+                if (!isMounted.current) return;
+                if (isVisible) {
+                    hideSidebar();
+                } else {
+                    showSidebar();
                 }
-                return null;
-            })
-            .filter(Boolean) as typeof folders;
-    }, [folders, searchTerm]);
+            },
+        }));
 
-    // Update search context when search term changes
-    React.useEffect(() => {
-        if (!searchTerm.trim()) {
-            setIsSearchActive(false);
-            setSearchResults([]);
-            return;
-        }
+        // Cleanup on unmount
+        React.useEffect(() => {
+            return () => {
+                isMounted.current = false;
+            };
+        }, []);
+        const {
+            searchTerm,
+            setSearchTerm,
+            searchResults,
+            setSearchResults,
+            isSearchActive,
+            setIsSearchActive,
+            clearSearch,
+        } = useSearch();
 
-        const lowerSearch = searchTerm.toLowerCase();
-        const results: { material: any; folder: any }[] = [];
+        const showSidebar = React.useCallback(() => {
+            setIsVisible(true);
+            Animated.timing(slideAnim, {
+                toValue: 0,
+                duration: 300,
+                useNativeDriver: true,
+            }).start();
+        }, [slideAnim]);
 
-        folders.forEach((folder) => {
-            folder.lessonMaterials?.forEach((material) => {
-                if (material.title.toLowerCase().includes(lowerSearch)) {
-                    results.push({ material, folder });
-                }
-            });
-        });
-
-        setSearchResults(results);
-        setIsSearchActive(true);
-    }, [searchTerm, folders]);
-
-    // Handle external visibility changes
-    React.useEffect(() => {
-        if (!isMounted.current) return;
-        
-        if (propVisible) {
-            showSidebar();
-        } else {
-            hideSidebar();
-        }
-    }, [propVisible, showSidebar, hideSidebar]);
-
-    // Handle back button press on Android
-    React.useEffect(() => {
-        const backAction = () => {
-            if (isVisible) {
-                hideSidebar(onClose);
-                return true;
-            }
-            return false;
-        };
-
-        const backHandler = BackHandler.addEventListener(
-            'hardwareBackPress',
-            backAction
+        const hideSidebar = React.useCallback(
+            (callback?: () => void) => {
+                Animated.timing(slideAnim, {
+                    toValue: width,
+                    duration: 300,
+                    useNativeDriver: true,
+                }).start(() => {
+                    setIsVisible(false);
+                    if (callback) callback();
+                });
+            },
+            [slideAnim]
         );
 
-        return () => backHandler.remove();
-    }, [isVisible, onClose, hideSidebar]);
+        // Filter folders and materials by search term
+        const filteredFolders = React.useMemo(() => {
+            if (!searchTerm.trim()) {
+                return folders;
+            }
 
-    return (
-        <Modal
-            visible={isVisible}
-            transparent
-            animationType="none"
-            onRequestClose={() => hideSidebar(onClose)}
-        >
-            <TouchableWithoutFeedback onPress={() => hideSidebar(onClose)}>
-                <View style={styles.overlay} />
-            </TouchableWithoutFeedback>
-            <Animated.View
-                style={[
-                    styles.sidebar,
-                    { transform: [{ translateX: slideAnim }] },
-                ]}
+            const lowerSearch = searchTerm.toLowerCase();
+            return folders
+                .map((folder) => {
+                    const filteredMaterials = folder.lessonMaterials?.filter(
+                        (material) =>
+                            material.title.toLowerCase().includes(lowerSearch)
+                    );
+                    if (filteredMaterials && filteredMaterials.length > 0) {
+                        return {
+                            ...folder,
+                            lessonMaterials: filteredMaterials,
+                            countLessonMaterials: filteredMaterials.length,
+                        };
+                    }
+                    return null;
+                })
+                .filter(Boolean) as typeof folders;
+        }, [folders, searchTerm]);
+
+        // Update search context when search term changes
+        React.useEffect(() => {
+            if (!searchTerm.trim()) {
+                setIsSearchActive(false);
+                setSearchResults([]);
+                return;
+            }
+
+            const lowerSearch = searchTerm.toLowerCase();
+            const results: { material: any; folder: any }[] = [];
+
+            folders.forEach((folder) => {
+                folder.lessonMaterials?.forEach((material) => {
+                    if (material.title.toLowerCase().includes(lowerSearch)) {
+                        results.push({ material, folder });
+                    }
+                });
+            });
+
+            setSearchResults(results);
+            setIsSearchActive(true);
+        }, [searchTerm, folders, setIsSearchActive, setSearchResults]);
+
+        // Handle external visibility changes
+        React.useEffect(() => {
+            if (!isMounted.current) return;
+
+            if (propVisible) {
+                showSidebar();
+            } else {
+                hideSidebar();
+            }
+        }, [propVisible, showSidebar, hideSidebar]);
+
+        // Handle back button press on Android
+        React.useEffect(() => {
+            const backAction = () => {
+                if (isVisible) {
+                    hideSidebar(onClose);
+                    return true;
+                }
+                return false;
+            };
+
+            const backHandler = BackHandler.addEventListener(
+                'hardwareBackPress',
+                backAction
+            );
+
+            return () => backHandler.remove();
+        }, [isVisible, onClose, hideSidebar]);
+
+        return (
+            <Modal
+                visible={isVisible}
+                transparent
+                animationType="none"
+                onRequestClose={() => hideSidebar(onClose)}
             >
-                <View style={styles.sidebarHeader}>
-                    <Text style={[styles.sidebarHeaderText, {maxWidth: '70%'}]} numberOfLines={1} ellipsizeMode="tail">
-                        {isSearchActive ? `Tìm kiếm: "${searchTerm}"` : 'Nội dung học tập'}
-                    </Text>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        {isSearchActive && (
+                <TouchableWithoutFeedback onPress={() => hideSidebar(onClose)}>
+                    <View style={styles.overlay} />
+                </TouchableWithoutFeedback>
+                <Animated.View
+                    style={[
+                        styles.sidebar,
+                        { transform: [{ translateX: slideAnim }] },
+                    ]}
+                >
+                    <View style={styles.sidebarHeader}>
+                        <Text
+                            style={[
+                                styles.sidebarHeaderText,
+                                { maxWidth: '70%' },
+                            ]}
+                            numberOfLines={1}
+                            ellipsizeMode="tail"
+                        >
+                            {isSearchActive
+                                ? `Tìm kiếm: "${searchTerm}"`
+                                : 'Nội dung học tập'}
+                        </Text>
+                        <View
+                            style={{
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                            }}
+                        >
+                            {isSearchActive && (
+                                <Pressable
+                                    onPress={clearSearch}
+                                    style={{
+                                        paddingVertical: 12,
+                                        paddingHorizontal: 8,
+                                    }}
+                                >
+                                    <FontAwesome6
+                                        name="times-circle"
+                                        solid
+                                        size={16}
+                                        color="#ff6b6b"
+                                    />
+                                </Pressable>
+                            )}
                             <Pressable
-                                onPress={clearSearch}
+                                onPress={onClose}
                                 style={{
                                     paddingVertical: 12,
-                                    paddingHorizontal: 8,
+                                    paddingHorizontal: 16,
                                 }}
                             >
                                 <FontAwesome6
-                                    name="times-circle"
+                                    name="xmark"
                                     solid
-                                    size={16}
-                                    color="#ff6b6b"
+                                    size={18}
+                                    color="#fff"
                                 />
                             </Pressable>
-                        )}
-                        <Pressable
-                            onPress={onClose}
-                            style={{
-                                paddingVertical: 12,
-                                paddingHorizontal: 16,
-                            }}
-                        >
-                            <FontAwesome6
-                                name="xmark"
-                                solid
-                                size={18}
-                                color="#fff"
-                            />
-                        </Pressable>
+                        </View>
                     </View>
-                </View>
 
-                {/* Search */}
+                    {/* Search */}
                     <View style={{ paddingHorizontal: 16, paddingVertical: 8 }}>
-                    <View style={[styles.searchWrapper]}>
-                        <Pressable
-                            style={({ pressed }) => [
-                                styles.button,
-                                { opacity: pressed ? 1 : 0.7 },
-                            ]}
-                        >
-                            <Ionicons name="search" size={22} color="#fff" />
-                        </Pressable>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Tìm kiếm..."
-                            placeholderTextColor="#fff"
-                            value={searchTerm}
-                            onChangeText={setSearchTerm}
-                        />
+                        <View style={[styles.searchWrapper]}>
+                            <Pressable
+                                style={({ pressed }) => [
+                                    styles.button,
+                                    { opacity: pressed ? 1 : 0.7 },
+                                ]}
+                            >
+                                <Ionicons
+                                    name="search"
+                                    size={22}
+                                    color="#fff"
+                                />
+                            </Pressable>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Tìm kiếm..."
+                                placeholderTextColor="#fff"
+                                value={searchTerm}
+                                onChangeText={setSearchTerm}
+                            />
+                        </View>
                     </View>
-
-                    </View>
-                {/* Folders */}
-                <ScrollView
-                    style={{ overflowY: 'auto', overscrollBehavior: 'contain' }}
-                >
-                    {filteredFolders.length === 0 ? (
-                        <Text style={{ color: '#fff', padding: 16 }}>
-                            {isSearchActive ? `Không tìm thấy kết quả cho "${searchTerm}"` : 'Không có dữ liệu'}
-                        </Text>
-                    ) : (
-                        <>
-                            {isSearchActive && (
-                                <View style={{ padding: 16, paddingBottom: 8 }}>
-                                    <Text style={{ color: '#fff', fontSize: 14 }}>
-                                        Tìm thấy {searchResults.length} kết quả
-                                    </Text>
-                                </View>
-                            )}
-                            {filteredFolders.map((folder) => {
-                                let currentFolderId;
-                                if (typeof folderId === 'string') {
-                                    currentFolderId = folderId;
-                                } else if (Array.isArray(folderId)) {
-                                    currentFolderId = folderId[0];
-                                } else {
-                                    currentFolderId = undefined;
-                                }
-                                const isActive = folder.id === currentFolderId;
-                                // Tìm index gốc của folder trong mảng folders ban đầu
-                                const originalIndex = folders.findIndex(f => f.id === folder.id);
-                                return (
-                                    <Folder
-                                        key={folder.id}
-                                        index={originalIndex}
-                                        folder={folder}
-                                        onClose={onClose}
-                                        isActive={isActive}
-                                    />
-                                );
-                            })}
-                        </>
-                    )}
-                </ScrollView>
-            </Animated.View>
-        </Modal>
-    );
-});
+                    {/* Folders */}
+                    <ScrollView
+                        style={{
+                            overflowY: 'auto',
+                            overscrollBehavior: 'contain',
+                        }}
+                    >
+                        {filteredFolders.length === 0 ? (
+                            <Text style={{ color: '#fff', padding: 16 }}>
+                                {isSearchActive
+                                    ? `Không tìm thấy kết quả cho "${searchTerm}"`
+                                    : 'Không có dữ liệu'}
+                            </Text>
+                        ) : (
+                            <>
+                                {isSearchActive && (
+                                    <View
+                                        style={{
+                                            padding: 16,
+                                            paddingBottom: 8,
+                                        }}
+                                    >
+                                        <Text
+                                            style={{
+                                                color: '#fff',
+                                                fontSize: 14,
+                                            }}
+                                        >
+                                            Tìm thấy {searchResults.length} kết
+                                            quả
+                                        </Text>
+                                    </View>
+                                )}
+                                {filteredFolders.map((folder) => {
+                                    let currentFolderId;
+                                    if (typeof folderId === 'string') {
+                                        currentFolderId = folderId;
+                                    } else if (Array.isArray(folderId)) {
+                                        currentFolderId = folderId[0];
+                                    } else {
+                                        currentFolderId = undefined;
+                                    }
+                                    const isActive =
+                                        folder.id === currentFolderId;
+                                    // Tìm index gốc của folder trong mảng folders ban đầu
+                                    const originalIndex = folders.findIndex(
+                                        (f) => f.id === folder.id
+                                    );
+                                    return (
+                                        <Folder
+                                            key={folder.id}
+                                            index={originalIndex}
+                                            folder={folder}
+                                            onClose={onClose}
+                                            isActive={isActive}
+                                        />
+                                    );
+                                })}
+                            </>
+                        )}
+                    </ScrollView>
+                </Animated.View>
+            </Modal>
+        );
+    }
+);
 
 // Add display name for debugging
 LessonSidebar.displayName = 'LessonSidebar';

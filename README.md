@@ -1,50 +1,100 @@
-# Welcome to your Expo app 👋
+# Eduva Mobile App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A React Native mobile application that provides an interactive learning platform for students and teachers. Built with Expo and TypeScript.
 
-## Get started
+## Features
+
+- 🏫 **Class Management**
+  - Join classes using class codes
+  - View enrolled classes and course materials
+  - Track learning progress
+
+- 📚 **Learning Materials**
+  - Support multiple content types (Video, Audio, PDF, DOCX)
+  - Interactive media players with playback controls
+  - Progress tracking across lessons
+
+- 💬 **Interactive Learning**
+  - Ask questions during lessons
+  - Comment and discuss with teachers and peers
+  - Rich text editor for detailed responses
+  - Best answer highlighting
+
+- 👤 **User Profile**
+  - View enrolled classes
+  - Track learning activities
+  - Manage personal information
+
+## Getting Started
 
 1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+2. Set up environment variables
+```bash
+cp .env.example .env
+# Configure your environment variables
+```
 
-## Learn more
+3. Start the development server
+```bash
+npx expo start
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+## Running the App
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- **iOS**: Press `i` in terminal or use iOS Simulator
+- **Android**: Press `a` in terminal or use Android Emulator
+- **Web**: Press `w` in terminal for web version
+- **Device**: Scan QR code with Expo Go app
 
-## Join the community
+## Tech Stack
 
-Join our community of developers creating universal apps.
+- React Native
+- Expo
+- TypeScript
+- React Query
+- React Navigation
+- Expo Router
+- React Native Rich Text Editor
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Project Structure
+
+```
+eduva-mobile/
+├── app/                  # Main application screens
+├── api/                  # API client and endpoints
+├── components/          # Reusable components
+├── constants/          # App constants
+├── contexts/           # React contexts
+├── hooks/             # Custom hooks
+├── types/             # TypeScript types
+└── utils/             # Utility functions
+```
+
+## Development
+
+The app uses Expo's file-based routing system. Main features are organized in the following directories:
+
+- `app/(tabs)`: Main tab navigation screens
+- `app/(routes)`: Other app routes
+- `components/learn`: Learning-related components
+- `components/profile`: Profile-related components
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is private and proprietary software.
+
+## Support
+
+For support or questions, please contact the development team.
