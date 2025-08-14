@@ -19,6 +19,7 @@ import {
     useQueryClient,
 } from '@tanstack/react-query';
 import { AxiosError, AxiosResponse } from 'axios';
+import { router } from 'expo-router';
 import { useToast } from './useToast';
 
 interface UseClassParams {
@@ -153,7 +154,13 @@ export const useEnrollClass = (): UseMutationResult<
         string
     >({
         mutationFn: (classCode: string) => enrollClass(classCode),
-        onSuccess: () => {
+        onSuccess: (response) => {
+            if (!response.data.data) return;
+            router.push(`/home/class/${response.data.data.classId}`);
+            toast.success(
+                'Tham gia lớp học thành công',
+                'Bạn đã tham gia lớp học thành công.'
+            );
             queryClient.invalidateQueries({ queryKey: ['classes'] });
         },
         onError: (res) => {
