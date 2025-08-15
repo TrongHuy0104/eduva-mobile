@@ -115,6 +115,23 @@ const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(
             );
         };
 
+        // Keep internal content in sync when initialContent prop changes
+        React.useEffect(() => {
+            const processed = replacePImageWithImg(initialContent);
+            if (processed !== content) {
+                setContent(processed);
+                // update editor if mounted
+                if (richTextRef.current) {
+                    try {
+                        richTextRef.current.setContentHTML(processed);
+                    } catch (e) {
+                        console.warn('Failed to set initial content on RichEditor', e);
+                    }
+                }
+            }
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [initialContent]);
+
         const handleChange = (html: string) => {
             const processedHtml = replacePImageWithImg(html);
             setContent(processedHtml);
