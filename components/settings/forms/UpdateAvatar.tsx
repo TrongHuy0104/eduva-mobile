@@ -82,10 +82,6 @@ const UpdateAvatar = ({
                         setLocalAvatar(null);
                         setSelectedAsset(null);
                         updateCurrentUser({ ...user, avatarUrl: url });
-                        Alert.alert(
-                            'Thành công',
-                            'Cập nhật ảnh đại diện thành công!'
-                        );
                         setDialogName('');
                     },
                     onError: () => {
