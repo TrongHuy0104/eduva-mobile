@@ -6,6 +6,7 @@ import React, {
     useEffect,
     useState,
 } from 'react';
+import { router } from 'expo-router';
 
 import { User } from '@/types/models/user.model';
 import { getItem, removeItem, setItem } from '../utils/storage';
@@ -38,6 +39,29 @@ export const setGlobalLogout = (fn: () => Promise<void>) => {
 };
 export const callGlobalLogout = async () => {
     if (globalLogout) await globalLogout();
+};
+
+// Global media pause registry - components can register a pause callback that will be
+// invoked on logout to ensure audio/video are stopped immediately.
+let globalMediaPauseFns: (() => Promise<void> | void)[] = [];
+export const registerGlobalMediaPause = (
+    fn: () => Promise<void> | void
+): (() => void) => {
+    globalMediaPauseFns.push(fn);
+    return () => {
+        globalMediaPauseFns = globalMediaPauseFns.filter((f) => f !== fn);
+    };
+};
+export const callGlobalMediaPause = async () => {
+    await Promise.all(
+        globalMediaPauseFns.map(async (fn) => {
+            try {
+                await Promise.resolve(fn());
+            } catch (e) {
+                console.warn('Global media pause handler failed', e);
+            }
+        })
+    );
 };
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
@@ -81,6 +105,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Logout function
     const logout = useCallback(async () => {
         try {
+            // First, pause any registered media to ensure playback stops immediately
+            await callGlobalMediaPause();
+
+            // navigate to a safe root route (replace to avoid keeping history)
+            try {
+                router.replace('/(tabs)/home');
+            } catch {
+                // ignore navigation errors
+            }
+
             await removeItem('accessToken');
             await removeItem('refreshToken');
             await removeItem('user');
