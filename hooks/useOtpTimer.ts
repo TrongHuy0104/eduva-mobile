@@ -38,6 +38,6 @@ export const useOtpTimer = () => {
     return {
         timeLeft,
         startTimer,
-        canResend: timeLeft === 0
+        canResend: timeLeft === 0,
     };
-}
+};
