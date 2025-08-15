@@ -77,7 +77,7 @@ export default function ConfirmPasswordForm() {
                     style={{ opacity: !inputValue ? 0.5 : 1 }}
                 >
                     <LinearGradient
-                        colors={['#2cccff', '#22dfbf']}
+                        colors={['#4dbfe9', '#2093e7', '#22cfd2']}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
                         style={{

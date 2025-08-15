@@ -71,7 +71,7 @@ const ResetPasswordScreen = () => {
             <View style={styles.header}>
                 <View style={styles.logoWrapper}>
                     <Pressable
-                        onPress={() => router.push('/(tabs)')}
+                        onPress={() => router.push('/(tabs)/home')}
                         style={{ display: 'flex', borderRadius: 10 }}
                     >
                         <Image

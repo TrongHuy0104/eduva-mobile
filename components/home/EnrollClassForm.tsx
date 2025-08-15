@@ -3,7 +3,6 @@ import { useModal } from '@/contexts/modal.context';
 import { useEnrollClass } from '@/hooks/useClass';
 import { useToast } from '@/hooks/useToast';
 import { Image } from 'expo-image';
-import { router } from 'expo-router';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import {
@@ -41,7 +40,7 @@ const EnrollClassForm = () => {
                     'Bạn đã tham gia lớp học thành công.'
                 );
                 closeModal();
-                router.push('/(tabs)/home');
+                // router.push('/(tabs)/home');
             },
             onError: (error) => {
                 console.log('Enroll error:', error);

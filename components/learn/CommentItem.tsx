@@ -74,8 +74,6 @@ export default function CommentItem({
     };
 
     const handleReplySubmit = async () => {
-        console.log(111);
-
         if (!richTextEditorRef.current) return;
 
         const content = richTextEditorRef.current.getContent();

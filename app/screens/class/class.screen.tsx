@@ -206,7 +206,7 @@ const ClassScreen = ({ classId }: { classId: string }) => {
                                 fontSize: 16,
                             }}
                         >
-                            Tham gia ngay
+                            Vào học ngay
                         </Text>
                     </Pressable>
                 </>
