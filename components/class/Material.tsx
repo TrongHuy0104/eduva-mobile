@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     materialTitle: {
         fontSize: 15,
         color: '#242424',
-        maxWidth: windowWidth(260),
+        maxWidth: windowWidth(240),
     },
     buttonPressed: {
         backgroundColor: '#f0f9ff',

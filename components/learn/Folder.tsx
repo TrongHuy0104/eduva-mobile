@@ -46,25 +46,24 @@ const Folder = ({ folder, index, onClose, isActive }: FolderProps) => {
 
     const getFolderDurationFormatted = () => {
         let totalDuration = 0;
-    
-        folder.lessonMaterials?.forEach(material => {
-          totalDuration += material.duration || 0;
+
+        folder.lessonMaterials?.forEach((material) => {
+            totalDuration += material.duration || 0;
         });
-    
+
         const hours = Math.floor(totalDuration / 3600);
         const minutes = Math.floor((totalDuration % 3600) / 60);
-    
-        if (hours >= 1) {
-          const paddedHours = String(hours).padStart(2, '0');
-          const paddedMinutes = String(minutes).padStart(2, '0');
-          return `${paddedHours} giờ ${paddedMinutes} phút`;
-        } else if (minutes > 0) {
-          return `${minutes} phút`;
-        } else {
-          return `0 phút`;
-        }
-      };
 
+        if (hours >= 1) {
+            const paddedHours = String(hours).padStart(2, '0');
+            const paddedMinutes = String(minutes).padStart(2, '0');
+            return `${paddedHours} giờ ${paddedMinutes} phút`;
+        } else if (minutes > 0) {
+            return `${minutes} phút`;
+        } else {
+            return `0 phút`;
+        }
+    };
 
     return (
         <View>
@@ -94,7 +93,9 @@ const Folder = ({ folder, index, onClose, isActive }: FolderProps) => {
                         >
                             |
                         </Text>
-                        <Text style={styles.folderDesc}>{getFolderDurationFormatted()}</Text>
+                        <Text style={styles.folderDesc}>
+                            {getFolderDurationFormatted()}
+                        </Text>
                     </View>
                 </View>
                 <Animated.View style={{ transform: [{ rotate }] }}>

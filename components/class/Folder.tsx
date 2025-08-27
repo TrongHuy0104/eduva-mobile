@@ -1,6 +1,7 @@
 import { FontAwesome6 } from '@expo/vector-icons';
 import React, { useState } from 'react';
 
+import { windowWidth } from '@/constants/app.constants';
 import { FoldersLessonMaterialsResponse } from '@/types/responses/folders-lesson-materials-response';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Material from './Material';
@@ -59,7 +60,7 @@ const Folder = ({ folder, classId, index }: FolderProps) => {
                         numberOfLines={1}
                         ellipsizeMode="tail"
                     >
-                        {index + 1}. {folder.name}
+                        {index + 1}. {folder.name}{' '}
                     </Text>
                 </View>
                 <Text style={styles.countMaterial}>
@@ -102,7 +103,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '600',
         color: '#1d2129',
-        maxWidth: 250,
+        maxWidth: windowWidth(230),
     },
     countMaterial: {
         fontSize: 14,
