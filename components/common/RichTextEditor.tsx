@@ -125,7 +125,10 @@ const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(
                     try {
                         richTextRef.current.setContentHTML(processed);
                     } catch (e) {
-                        console.warn('Failed to set initial content on RichEditor', e);
+                        console.warn(
+                            'Failed to set initial content on RichEditor',
+                            e
+                        );
                     }
                 }
             }
